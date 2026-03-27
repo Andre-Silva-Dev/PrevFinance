@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="PrevFinance.Api/PrevFinance.Api.csproj" />
+  <Project Path="PrevFinance.Application/PrevFinance.Application.csproj" />
+  <Project Path="PrevFinance.Domain/PrevFinance.Domain.csproj" />
+  <Project Path="PrevFinance.Infrastructure/PrevFinance.Infrastructure.csproj" />
+  <Project Path="PrevFinance.IntegrationTests/PrevFinance.IntegrationTests.csproj" />
+  <Project Path="PrevFinance.UnitTests/PrevFinance.UnitTests.csproj" />
+</Solution>
