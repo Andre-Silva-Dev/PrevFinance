@@ -15,6 +15,7 @@ Pode ser executada apos cada modulo principal estar pronto, funcionando como tri
 - Criterios de aceite do MVP atendidos.
 - Evidencias de testes e monitoramento publicadas.
 - Plano de release aprovado.
+- Todas as funcionalidades da fase possuem testes unitarios e de integracao cobrindo sucesso e erro.
 
 ## Tasks
 - TASK-01-Fortalecer-Seguranca-e-Privacidade.md

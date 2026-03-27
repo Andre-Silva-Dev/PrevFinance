@@ -15,6 +15,7 @@ Fase validavel via API e tela de dashboard, mesmo sem simulador de quitacao fina
 - Projecao de 12 meses funcional por dia.
 - Dashboard carrega em menos de 2 segundos com cache aquecido.
 - Alertas de saldo negativo aparecem corretamente.
+- Todas as funcionalidades da fase possuem testes unitarios e de integracao cobrindo sucesso e erro.
 
 ## Tasks
 - TASK-01-Implementar-Motor-de-Projecao.md

@@ -29,6 +29,8 @@ Fase: 00 - Nome da Fase
 Task: TASK-00 - Nome da Task
 Resumo: O que foi entregue em termos tecnicos
 Evidencias: Link de PR, commit, screenshot, script ou log
+Testes Unitarios: Resultado e cobertura dos cenarios de sucesso e erro
+Testes de Integracao: Resultado e cobertura dos cenarios de sucesso e erro
 Riscos: Risco residual apos entrega
 Proximo passo: Qual task sera iniciada em seguida
 

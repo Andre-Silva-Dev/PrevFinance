@@ -15,6 +15,7 @@ A fase pode ser validada sem dashboard final, pois o foco esta em acesso e segur
 - Usuario autentica e acessa apenas dados proprios.
 - Tentativa de acesso cruzado retorna negacao controlada.
 - Auditoria de seguranca cobre principais fluxos.
+- Todas as funcionalidades da fase possuem testes unitarios e de integracao cobrindo sucesso e erro.
 
 ## Tasks
 - TASK-01-Implementar-Cadastro-e-Login.md

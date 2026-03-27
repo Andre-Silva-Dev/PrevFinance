@@ -58,10 +58,31 @@ O **PrevFinance** é uma plataforma de inteligência financeira focada em **prev
 | **NFR2** | **Segurança**   | Criptografia de dados sensíveis (descrições) e TLS em trânsito.               |
 | **NFR3** | **Arquitetura** | Modular Monolith (Clean Architecture) para facilitar manutenção e escala.     |
 | **NFR4** | **UX/UI**       | Interface responsiva baseada em TailwindCSS, focada em visualização de dados. |
+| **NFR5** | **Qualidade**   | Toda funcionalidade deve ter testes unitários e de integração cobrindo sucesso e erro. |
 
 ---
 
-## 5. Regras de Negócio (Business Rules)
+## 5. Estratégia de Qualidade e Testes (TDD)
+
+Para garantir a precisão matemática das projeções e o isolamento de dados (Multi-tenancy), o desenvolvimento seguirá a metodologia **TDD (Test-Driven Development)**.
+
+### 5.1. Cobertura Crítica
+As seguintes áreas devem possuir 100% de cobertura de testes de unidade antes da implementação da UI:
+* **Motor de Projeção:** Validação de saldos futuros com diferentes combinações de gastos e rendas.
+* **Lógica de Parcelamento:** Testes de borda para meses com 25, 30 e 31 dias.
+* **Algoritmos de Dívida:** Validação dos métodos Avalanche e Bola de Neve.
+
+### 5.2. Testes de Integração Obrigatórios
+* **Isolamento de Tenant:** Testes automatizados que tentam consultar dados do `User_A` usando o token do `User_B` (deve retornar 403/404).
+* **Persistência:** Garantir que o arredondamento de duas casas decimais no PostgreSQL não gere perdas financeiras em somatórios de longo prazo.
+
+### 5.3. Ferramentas de Teste
+* **Backend:** xUnit, FluentAssertions e Testcontainers (PostgreSQL).
+* **Frontend:** Jasmine/Karma ou Jest para lógica de Signals no Angular.
+
+---
+
+## 6. Regras de Negócio (Business Rules)
 
 1.  **Tratamento de Atrasos:** Transações pendentes com data de vencimento retroativa são marcadas como `Overdue` e mantidas no cálculo de saldo atual até serem pagas ou canceladas.
 2.  **Essencialidade de Gastos:** Gastos marcados como "Não Essenciais" são os primeiros sugeridos para corte em simulações de economia.
@@ -69,7 +90,7 @@ O **PrevFinance** é uma plataforma de inteligência financeira focada em **prev
 
 ---
 
-## 6. Especificações Técnicas Sugeridas
+## 7. Especificações Técnicas Sugeridas
 * **Backend:** ASP.NET Core 10 (C#).
 * **Frontend:** Angular 21 (Signals & Standalone Components).
 * **Database:** PostgreSQL (Relacional) + Redis (Cache).
@@ -77,8 +98,16 @@ O **PrevFinance** é uma plataforma de inteligência financeira focada em **prev
 
 ---
 
-## 7. Critérios de Aceite (MVP)
+## 8. Critérios de Aceite (MVP)
 * [ ] Fluxo completo de autenticação e criação de perfil.
 * [ ] Cadastro de conta bancária com saldo inicial.
 * [ ] Lançamento de um parcelamento (ex: 12x) com reflexo imediato no gráfico de 12 meses.
 * [ ] Visualização de Dashboard com saldo projetado e lista de contas a pagar/receber.
+* [ ] Todas as funcionalidades entregues no MVP possuem testes unitarios e de integracao cobrindo casos de sucesso e de erro.
+
+---
+
+## 9. Politica de Testes Obrigatoria
+- Toda nova funcionalidade deve ser entregue com testes unitarios e testes de integracao.
+- A cobertura da funcionalidade deve incluir casos de sucesso, erros de validacao, erros de negocio e erros de infraestrutura relevantes.
+- Nao e permitido concluir task sem evidencia de execucao e aprovacao dos testes associados.

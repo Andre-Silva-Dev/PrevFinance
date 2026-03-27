@@ -15,6 +15,7 @@ Pode ser executada sobre dados existentes de transacoes e contas, sem alterar a 
 - Usuario entende ordem sugerida de quitacao.
 - Simulacao calcula nova data final com aporte extra.
 - Recomendacoes de corte de gastos nao essenciais sao exibidas.
+- Todas as funcionalidades da fase possuem testes unitarios e de integracao cobrindo sucesso e erro.
 
 ## Tasks
 - TASK-01-Identificar-Dividas-com-Juros.md

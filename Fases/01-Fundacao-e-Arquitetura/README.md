@@ -15,6 +15,7 @@ Esta fase gera uma base executavel por si so, sem depender de implementacoes de 
 - Solucao compila e sobe localmente.
 - Pipeline de CI valida build e testes iniciais.
 - Estrutura de camadas e modulos esta documentada.
+- Todas as funcionalidades da fase possuem testes unitarios e de integracao cobrindo sucesso e erro.
 
 ## Tasks
 - TASK-01-Definir-Arquitetura-e-Solucao.md

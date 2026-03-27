@@ -15,6 +15,7 @@ Esta fase pode ser usada de forma isolada por API para validar motor financeiro 
 - Usuario cria contas e ajusta saldo.
 - Parcelamento gera transacoes futuras automaticamente.
 - Edicao de parcela individual e em serie funciona conforme regra.
+- Todas as funcionalidades da fase possuem testes unitarios e de integracao cobrindo sucesso e erro.
 
 ## Tasks
 - TASK-01-Implementar-Gestao-de-Contas-e-Saldos.md

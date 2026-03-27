@@ -3,6 +3,11 @@
 Este diretorio organiza o plano em fases independentes.
 Cada fase possui um README com objetivo, escopo e criterio de conclusao, alem de tasks em arquivos separados.
 
+## Regra Transversal de Testes
+- Toda funcionalidade desenvolvida em qualquer fase deve possuir testes unitarios e testes de integracao.
+- Os testes devem cobrir casos de sucesso e casos de erro da funcionalidade.
+- Nenhuma task pode ser finalizada sem evidencia de execucao desses testes.
+
 ## Fases
 
 1. 01-Fundacao-e-Arquitetura
