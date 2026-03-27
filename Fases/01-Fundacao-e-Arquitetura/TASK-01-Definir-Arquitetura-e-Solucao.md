@@ -4,7 +4,7 @@
 Definir a arquitetura base e a organizacao da solucao para suportar crescimento modular.
 
 ## Entregaveis
-- Estrutura da solucao backend por camadas (Domain, Application, Infrastructure, WebApi).
+- Estrutura da solucao backend por camadas (Domain, Application, Infrastructure, Api).
 - Estrutura inicial frontend Angular por features.
 - Documento curto de convencoes arquiteturais.
 
