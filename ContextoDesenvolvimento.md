@@ -14,7 +14,7 @@ Use este documento para manter rastreabilidade entre planejamento, execucao e en
 
 | Fase | Nome | Status | Inicio | Fim | Responsavel | Observacoes |
 | --- | --- | --- | --- | --- | --- | --- |
-| 01 | Fundacao e Arquitetura | Nao iniciada | - | - | - | - |
+| 01 | Fundacao e Arquitetura | Concluida | 2026-03-27 | 2026-03-27 | Andre Silva | TASK-01, TASK-02 e TASK-03 concluidas com testes |
 | 02 | Identidade e Multi-Tenancy | Nao iniciada | - | - | - | - |
 | 03 | Contas, Transacoes e Parcelamento | Nao iniciada | - | - | - | - |
 | 04 | Projecoes e Dashboard | Nao iniciada | - | - | - | - |
@@ -46,6 +46,39 @@ Resumo: Criacao do plano de desenvolvimento por fases independentes e tarefas se
 Evidencias: Estrutura de pastas em Fases e documentos de task.
 Riscos: Nenhum risco tecnico identificado nesta etapa de planejamento.
 Proximo passo: Iniciar Fase 01, TASK-01.
+
+#### 2026-03-27
+Data: 2026-03-27
+Fase: 01 - Fundacao e Arquitetura
+Task: TASK-01 - Definir Arquitetura e Solucao
+Resumo: Criacao da solucao backend em camadas (Domain, Application, Infrastructure e Api), composicao de DI por extensoes, fronteiras de modulo (Auth, Finance, Projection e Debt) e estrutura frontend Angular por features.
+Evidencias: src/backend/PrevFinance.slnx; src/backend/PrevFinance.Api/Program.cs; src/frontend/prevfinance-web/src/app/app.routes.ts; docs/arquitetura-fase-01.md.
+Testes Unitarios: dotnet test src/backend/PrevFinance.slnx com 5 testes unitarios (sucesso e erro de validacao/DI) aprovados.
+Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com 2 testes de integracao de persistencia (sucesso e erro) aprovados.
+Riscos: Integracao por Testcontainers depende de Docker ativo no host.
+Proximo passo: Executar TASK-02 para ambiente e CI.
+
+#### 2026-03-27
+Data: 2026-03-27
+Fase: 01 - Fundacao e Arquitetura
+Task: TASK-02 - Preparar Ambiente e CI
+Resumo: Ambiente local padronizado com docker-compose (PostgreSQL e Redis), scripts PowerShell para subir/parar/testar, lint frontend com angular-eslint e pipeline CI para push/PR com build, lint e testes de backend/frontend.
+Evidencias: docker-compose.yml; scripts/dev-up.ps1; scripts/frontend-test.ps1; .github/workflows/ci.yml; docs/setup-ambiente.md.
+Testes Unitarios: npm run test em src/frontend/prevfinance-web com 9 testes aprovados.
+Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com testes de integracao de persistencia aprovados.
+Riscos: Sem Docker em execucao local, testes de integracao backend entram em fallback e nao exercitam banco real.
+Proximo passo: Executar TASK-03 para modelagem e migration inicial.
+
+#### 2026-03-27
+Data: 2026-03-27
+Fase: 01 - Fundacao e Arquitetura
+Task: TASK-03 - Modelagem Inicial de Dados
+Resumo: Implementacao das entidades User, Profile, Account e Transaction com auditoria (CreatedAtUtc/UpdatedAtUtc), mapeamentos EF Core com indices por usuario e periodo, migration inicial versionada e seed tecnico.
+Evidencias: src/backend/PrevFinance.Infrastructure/Persistence/PrevFinanceDbContext.cs; src/backend/PrevFinance.Infrastructure/Persistence/Migrations/20260327173955_InitialCreate.cs; src/backend/scripts/seed-tech.sql.
+Testes Unitarios: dotnet test src/backend/PrevFinance.slnx com validacoes de dominio e DI aprovadas.
+Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com cenarios de sucesso (persistencia e consulta) e erro (violacao de FK) aprovados.
+Riscos: Nenhum risco tecnico residual relevante para a modelagem inicial.
+Proximo passo: Iniciar Fase 02, TASK-01.
 
 ## Decisoes Arquiteturais Relevantes
 

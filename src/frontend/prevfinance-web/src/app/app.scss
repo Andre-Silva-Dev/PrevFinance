@@ -1,0 +1,50 @@
+:host {
+	display: block;
+	min-height: 100dvh;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	color: #1d2939;
+}
+
+.app-shell {
+	min-height: 100dvh;
+	background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+.topbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1rem 1.5rem;
+	border-bottom: 1px solid #d0d5dd;
+	background: #ffffff;
+}
+
+.brand {
+	font-size: 1.1rem;
+	font-weight: 700;
+}
+
+.menu {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.menu-link {
+	padding: 0.35rem 0.7rem;
+	border-radius: 999px;
+	color: #344054;
+	text-decoration: none;
+}
+
+.menu-link.active {
+	background: #0f766e;
+	color: #ffffff;
+}
+
+.content {
+	max-width: 1024px;
+	margin: 0 auto;
+	padding: 1.5rem;
+}

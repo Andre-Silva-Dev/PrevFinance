@@ -1,0 +1,22 @@
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand">{{ appName }}</div>
+
+    <nav class="menu" aria-label="Navegacao principal">
+      @for (item of menu; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+          class="menu-link"
+        >
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+  </header>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>
