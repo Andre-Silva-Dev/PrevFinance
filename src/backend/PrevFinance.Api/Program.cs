@@ -13,6 +13,8 @@ using PrevFinance.Infrastructure.DependencyInjection;
 using PrevFinance.Infrastructure.Persistence;
 using PrevFinance.Infrastructure.Persistence.Seeding;
 
+LoadEnvironmentVariablesFromDotEnv();
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
@@ -95,5 +97,50 @@ app.MapHealthChecks("/health");
 app.MapHealthChecks("/health/ready");
 
 app.Run();
+
+static void LoadEnvironmentVariablesFromDotEnv()
+{
+    var cwd = Directory.GetCurrentDirectory();
+    var candidates = new[]
+    {
+        Path.Combine(cwd, ".env"),
+        Path.GetFullPath(Path.Combine(cwd, "..", "..", ".env")),
+        Path.GetFullPath(Path.Combine(cwd, "..", "..", "..", ".env"))
+    };
+
+    var envPath = candidates.FirstOrDefault(File.Exists);
+    if (string.IsNullOrWhiteSpace(envPath))
+    {
+        return;
+    }
+
+    foreach (var rawLine in File.ReadAllLines(envPath))
+    {
+        var line = rawLine.Trim();
+        if (line.Length == 0 || line.StartsWith('#'))
+        {
+            continue;
+        }
+
+        var separatorIndex = line.IndexOf('=');
+        if (separatorIndex <= 0)
+        {
+            continue;
+        }
+
+        var key = line[..separatorIndex].Trim();
+        var value = line[(separatorIndex + 1)..].Trim();
+
+        if (value.StartsWith('"') && value.EndsWith('"') && value.Length >= 2)
+        {
+            value = value[1..^1];
+        }
+
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(key)))
+        {
+            Environment.SetEnvironmentVariable(key, value);
+        }
+    }
+}
 
 public partial class Program;
