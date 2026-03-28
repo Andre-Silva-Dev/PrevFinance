@@ -1,1 +1,256 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
+
+:root {
+	--font-heading: 'Poppins', 'Segoe UI', sans-serif;
+	--font-body: 'Monsterart', 'Montserrat', 'Segoe UI', sans-serif;
+
+	--color-bg: #06162f;
+	--color-bg-soft: #0b2345;
+	--color-panel: rgba(8, 30, 62, 0.74);
+	--color-panel-strong: #0f2a52;
+	--color-border: rgba(157, 190, 229, 0.25);
+
+	--color-primary: #1f5da8;
+	--color-primary-strong: #123d76;
+	--color-accent: #35c7b8;
+	--color-accent-soft: #8ce0d7;
+	--color-warm: #d4b261;
+
+	--color-text: #f4f9ff;
+	--color-text-soft: #c6d6ea;
+	--color-text-muted: #9eb3cf;
+
+	--shadow-soft: 0 12px 38px rgba(3, 14, 30, 0.35);
+	--shadow-strong: 0 28px 56px rgba(2, 10, 24, 0.52);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	min-height: 100%;
+}
+
+body {
+	font-family: var(--font-body);
+	color: var(--color-text);
+	overflow-x: hidden;
+	background:
+		radial-gradient(circle at 10% -20%, rgba(53, 199, 184, 0.24) 0%, rgba(53, 199, 184, 0) 40%),
+		radial-gradient(circle at 90% 0%, rgba(31, 93, 168, 0.34) 0%, rgba(31, 93, 168, 0) 46%),
+		linear-gradient(160deg, #041027 0%, #071e3d 45%, #0b1f3f 100%);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 360ms;
+	animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+::view-transition-old(root) {
+	animation-name: route-fade-out;
+}
+
+::view-transition-new(root) {
+	animation-name: route-fade-in;
+}
+
+@keyframes route-fade-out {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	to {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+}
+
+@keyframes route-fade-in {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+		filter: saturate(90%);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+		filter: saturate(100%);
+	}
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button,
+.btn {
+	font-family: var(--font-heading);
+	letter-spacing: 0.01em;
+}
+
+p,
+li,
+small,
+span,
+label,
+input,
+textarea {
+	font-family: var(--font-body);
+}
+
+a {
+	color: inherit;
+}
+
+.pf-card {
+	border: 1px solid var(--color-border);
+	border-radius: 18px;
+	background: linear-gradient(155deg, rgba(13, 42, 79, 0.84), rgba(7, 28, 56, 0.74));
+	box-shadow: var(--shadow-soft);
+	backdrop-filter: blur(10px);
+	transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+}
+
+.pf-card:hover {
+	transform: translateY(-3px);
+	box-shadow: var(--shadow-strong);
+	border-color: rgba(140, 224, 215, 0.35);
+}
+
+.pf-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.35rem 0.9rem;
+	border: 1px solid rgba(140, 224, 215, 0.45);
+	border-radius: 999px;
+	background: rgba(9, 44, 81, 0.66);
+	color: var(--color-accent-soft);
+	font-family: var(--font-heading);
+	font-size: 0.76rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.pf-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.45rem;
+	padding: 0.75rem 1.2rem;
+	border: 1px solid transparent;
+	border-radius: 12px;
+	background: linear-gradient(135deg, var(--color-accent) 0%, #1ca5bb 100%);
+	color: #07213e;
+	font-size: 0.88rem;
+	font-weight: 700;
+	text-decoration: none;
+	cursor: pointer;
+	transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.pf-button:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 12px 24px rgba(28, 165, 187, 0.35);
+}
+
+.reveal {
+	opacity: 0;
+	transform: translateY(20px) scale(0.985);
+	filter: blur(4px);
+	transition:
+		opacity 540ms cubic-bezier(0.21, 0.61, 0.35, 1) var(--reveal-delay, 0ms),
+		transform 540ms cubic-bezier(0.21, 0.61, 0.35, 1) var(--reveal-delay, 0ms),
+		filter 480ms ease var(--reveal-delay, 0ms);
+	will-change: opacity, transform;
+}
+
+.reveal.reveal-visible {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+	filter: blur(0);
+}
+
+.pf-button.secondary {
+	border-color: rgba(212, 178, 97, 0.45);
+	background: rgba(12, 38, 70, 0.7);
+	color: #f7e3b6;
+}
+
+.pf-feature-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 1rem;
+}
+
+.pf-feature-item {
+	padding: 1.1rem;
+}
+
+.pf-feature-item h3 {
+	margin: 0 0 0.5rem;
+	font-size: 1.02rem;
+}
+
+.pf-feature-item p {
+	margin: 0;
+	color: var(--color-text-soft);
+}
+
+.pf-module-page {
+	display: grid;
+	gap: 1.25rem;
+}
+
+.pf-module-header {
+	padding: 1.25rem;
+}
+
+.pf-module-header h1 {
+	margin: 0.55rem 0;
+	font-size: clamp(1.45rem, 2.4vw, 2rem);
+}
+
+.pf-module-header p {
+	margin: 0;
+	max-width: 70ch;
+	color: var(--color-text-soft);
+	line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+	.pf-module-header,
+	.pf-feature-item {
+		padding: 1rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation: none;
+	}
+
+	* {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	.reveal,
+	.reveal.reveal-visible {
+		opacity: 1;
+		transform: none;
+		filter: none;
+	}
+}
