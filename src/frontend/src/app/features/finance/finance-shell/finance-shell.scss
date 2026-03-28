@@ -1,0 +1,151 @@
+.gate-panel {
+	padding: 1.2rem;
+	display: grid;
+	gap: 0.8rem;
+}
+
+.gate-panel h2,
+.accounts-head h2 {
+	margin: 0;
+	font-size: 1.12rem;
+}
+
+.gate-panel p {
+	margin: 0;
+	color: var(--color-text-soft);
+	line-height: 1.5;
+}
+
+.finance-layout {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.finance-panel {
+	padding: 1.2rem;
+}
+
+.finance-panel h2 {
+	margin: 0 0 0.9rem;
+	font-size: 1.05rem;
+}
+
+.finance-form {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.finance-form label {
+	display: grid;
+	gap: 0.35rem;
+}
+
+.finance-form span {
+	font-size: 0.82rem;
+	color: var(--color-text-soft);
+}
+
+.finance-form input,
+.finance-form select {
+	width: 100%;
+	border-radius: 11px;
+	border: 1px solid rgba(157, 190, 229, 0.28);
+	background: rgba(6, 25, 49, 0.72);
+	color: var(--color-text);
+	padding: 0.72rem 0.8rem;
+	outline: none;
+	transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.finance-form input:focus,
+.finance-form select:focus {
+	border-color: rgba(140, 224, 215, 0.65);
+	box-shadow: 0 0 0 3px rgba(53, 199, 184, 0.18);
+}
+
+.feedback {
+	margin: 0;
+	padding: 0.6rem 0.75rem;
+	border-radius: 10px;
+	font-size: 0.82rem;
+}
+
+.feedback.error {
+	border: 1px solid rgba(224, 137, 137, 0.55);
+	background: rgba(117, 24, 24, 0.34);
+	color: #ffd4d4;
+}
+
+.feedback.success {
+	border: 1px solid rgba(140, 224, 215, 0.45);
+	background: rgba(23, 91, 85, 0.33);
+	color: #d6fbf6;
+}
+
+.accounts-area {
+	display: grid;
+	gap: 0.95rem;
+}
+
+.accounts-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.8rem;
+}
+
+.loading-state {
+	margin: 0;
+	color: var(--color-text-soft);
+}
+
+.account-card {
+	display: grid;
+	gap: 0.8rem;
+}
+
+.account-card header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.8rem;
+}
+
+.account-card h3 {
+	margin: 0;
+	font-size: 1rem;
+}
+
+.account-card p {
+	margin: 0;
+	color: var(--color-text-soft);
+}
+
+.account-actions {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.empty-card {
+	padding: 1.1rem;
+}
+
+@media (max-width: 920px) {
+	.finance-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.accounts-head {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+}
+
+@media (max-width: 640px) {
+	.finance-panel,
+	.gate-panel {
+		padding: 1rem;
+	}
+}

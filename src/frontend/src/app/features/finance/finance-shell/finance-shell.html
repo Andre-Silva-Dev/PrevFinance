@@ -1,25 +1,123 @@
 <section class="pf-module-page">
 	<article class="pf-card pf-module-header" appRevealOnScroll>
 		<span class="pf-pill">Contas e transacoes</span>
-		<h1>Painel financeiro com visao clara de saldos e movimentacoes.</h1>
+		<h1>Gerencie suas contas com isolamento por usuario e foco operacional.</h1>
 		<p>
-			Organize contas, acompanhe entradas e saidas e mantenha consistencia de dados para
-			alimentar projecoes e estrategias de quitacao com precisao.
+			Esta tela opera os endpoints protegidos de contas para validar o ciclo multi-tenant no frontend:
+			cada sessao visualiza e manipula apenas os dados do proprio usuario autenticado.
 		</p>
 	</article>
 
+	@if (!sessionService.session()) {
+		<section class="pf-card gate-panel" appRevealOnScroll [revealDelay]="80">
+			<h2>Sessao necessaria</h2>
+			<p>Faca login na area de identidade para carregar e gerenciar suas contas.</p>
+			<a class="pf-button" routerLink="/auth">Ir para autenticacao</a>
+		</section>
+	} @else {
+		<article class="finance-layout">
+			<section class="pf-card finance-panel" appRevealOnScroll [revealDelay]="80">
+				<h2>Nova conta</h2>
+				<form class="finance-form" [formGroup]="createForm" (ngSubmit)="createAccount()">
+					<label>
+						<span>Nome da conta</span>
+						<input type="text" formControlName="name" placeholder="Conta principal" />
+					</label>
+					<label>
+						<span>Tipo</span>
+						<select formControlName="type">
+							@for (type of accountTypes; track type) {
+								<option [value]="type">{{ type }}</option>
+							}
+						</select>
+					</label>
+					<label>
+						<span>Saldo inicial</span>
+						<input type="number" formControlName="initialBalance" step="0.01" />
+					</label>
+					<button class="pf-button" type="submit" [disabled]="actionLoading()">Criar conta</button>
+				</form>
+			</section>
+
+			<section class="pf-card finance-panel" appRevealOnScroll [revealDelay]="140">
+				<h2>Renomear conta</h2>
+				<form class="finance-form" [formGroup]="renameForm" (ngSubmit)="renameAccount()">
+					<label>
+						<span>Conta selecionada</span>
+						<select formControlName="accountId">
+							<option value="">Selecione uma conta</option>
+							@for (account of accounts(); track account.id) {
+								<option [value]="account.id">{{ account.name }}</option>
+							}
+						</select>
+					</label>
+					<label>
+						<span>Novo nome</span>
+						<input type="text" formControlName="name" placeholder="Nome atualizado" />
+					</label>
+					<button class="pf-button secondary" type="submit" [disabled]="actionLoading()">
+						Salvar alteracao
+					</button>
+				</form>
+			</section>
+		</article>
+
+		@if (error()) {
+			<p class="feedback error">{{ error() }}</p>
+		}
+		@if (feedback()) {
+			<p class="feedback success">{{ feedback() }}</p>
+		}
+
+		<section class="accounts-area">
+			<header class="accounts-head" appRevealOnScroll [revealDelay]="180">
+				<h2>Minhas contas</h2>
+				<button class="pf-button secondary" type="button" (click)="loadAccounts()" [disabled]="loading()">
+					Atualizar lista
+				</button>
+			</header>
+
+			@if (loading()) {
+				<p class="loading-state">Carregando contas...</p>
+			}
+
+			<div class="pf-feature-grid" appRevealOnScroll [revealDelay]="220">
+				@for (account of accounts(); track account.id) {
+					<section class="pf-card pf-feature-item account-card">
+						<header>
+							<h3>{{ account.name }}</h3>
+							<span class="pf-pill">{{ account.type }}</span>
+						</header>
+						<p>Saldo inicial: <strong>{{ formatCurrency(account.initialBalance) }}</strong></p>
+						<div class="account-actions">
+							<button class="pf-button secondary" type="button" (click)="preloadRename(account)">Editar</button>
+							<button class="pf-button secondary" type="button" (click)="deleteAccount(account.id)">Excluir</button>
+						</div>
+					</section>
+				}
+
+				@if (accounts().length === 0 && !loading()) {
+					<section class="pf-card pf-feature-item empty-card">
+						<h3>Nenhuma conta cadastrada</h3>
+						<p>Crie sua primeira conta para liberar os proximos fluxos de transacoes e projecoes.</p>
+					</section>
+				}
+			</div>
+		</section>
+	}
+
 	<article class="pf-feature-grid">
-		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="80">
-			<h3>Consolidacao de contas</h3>
-			<p>Visual unificado para conta corrente, credito e reservas em uma unica visao.</p>
+		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="260">
+			<h3>Cadastro controlado</h3>
+			<p>Crie contas por tipo com saldo inicial e base consistente para operacoes futuras.</p>
 		</section>
-		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="160">
-			<h3>Parcelamento inteligente</h3>
-			<p>Estrutura de parcelas conectada ao calendario financeiro e ao fluxo de caixa previsto.</p>
+		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="300">
+			<h3>Ownership garantido</h3>
+			<p>Atualizacoes e exclusoes seguem validacao por recurso com contexto autenticado.</p>
 		</section>
-		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="240">
-			<h3>Edicao em cascata</h3>
-			<p>Atualizacoes em serie com regras de overdue para preservar historico e previsibilidade.</p>
+		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="320">
+			<h3>Pronto para fase 03</h3>
+			<p>Base visual e tecnica preparada para transacoes e parcelamento inteligente.</p>
 		</section>
 	</article>
 </section>

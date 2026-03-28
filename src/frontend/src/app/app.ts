@@ -15,10 +15,10 @@ export class App {
 
   protected readonly menu = [
     { path: '/', label: 'Inicio' },
-    { path: '/auth', label: 'Auth' },
-    { path: '/finance', label: 'Finance' },
-    { path: '/projection', label: 'Projection' },
-    { path: '/debt', label: 'Debt' }
+    { path: '/auth', label: 'Identidade' },
+    { path: '/finance', label: 'Contas' },
+    { path: '/projection', label: 'Projecao' },
+    { path: '/debt', label: 'Dividas' }
   ];
 
   protected onRouteActivated(): void {

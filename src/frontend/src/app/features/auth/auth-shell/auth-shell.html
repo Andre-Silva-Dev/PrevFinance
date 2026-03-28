@@ -1,25 +1,136 @@
 <section class="pf-module-page">
 	<article class="pf-card pf-module-header" appRevealOnScroll>
 		<span class="pf-pill">Identidade e acesso</span>
-		<h1>Cadastro, login e autorizacao com confiabilidade.</h1>
+		<h1>Cadastro, login e perfil em uma experiencia unica de identidade.</h1>
 		<p>
-			Esta area prepara a experiencia segura do usuario com autenticacao moderna,
-			fluxo social OAuth2 e controle de perfis para operacao multi-tenant.
+			Gerencie sessao com e-mail/senha, valide onboarding por OAuth2 demo e mantenha seu perfil
+			atualizado para operar os modulos financeiros com isolamento seguro por usuario.
 		</p>
 	</article>
 
+	<article class="auth-layout">
+		<section class="pf-card auth-panel" appRevealOnScroll [revealDelay]="80">
+			<header class="auth-head">
+				<h2>Autenticacao</h2>
+				<div class="mode-switch" role="tablist" aria-label="Modo de autenticacao">
+					<button
+						type="button"
+						class="mode-button"
+						[class.active]="mode() === 'login'"
+						(click)="switchMode('login')"
+					>
+						Login
+					</button>
+					<button
+						type="button"
+						class="mode-button"
+						[class.active]="mode() === 'register'"
+						(click)="switchMode('register')"
+					>
+						Cadastro
+					</button>
+				</div>
+			</header>
+
+			@if (mode() === 'login') {
+				<form class="auth-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+					<label>
+						<span>E-mail</span>
+						<input type="email" formControlName="email" placeholder="voce@prevfinance.app" />
+					</label>
+					<label>
+						<span>Senha</span>
+						<input type="password" formControlName="password" placeholder="Minimo de 8 caracteres" />
+					</label>
+					<button class="pf-button" type="submit" [disabled]="loading()">Entrar</button>
+				</form>
+			}
+
+			@if (mode() === 'register') {
+				<form class="auth-form" [formGroup]="registerForm" (ngSubmit)="submitRegister()">
+					<label>
+						<span>Nome completo</span>
+						<input type="text" formControlName="fullName" placeholder="Seu nome completo" />
+					</label>
+					<label>
+						<span>E-mail</span>
+						<input type="email" formControlName="email" placeholder="voce@prevfinance.app" />
+					</label>
+					<label>
+						<span>Senha</span>
+						<input type="password" formControlName="password" placeholder="Minimo de 8 caracteres" />
+					</label>
+					<button class="pf-button" type="submit" [disabled]="loading()">Criar conta</button>
+				</form>
+			}
+
+			<div class="auth-divider">
+				<span>ou</span>
+			</div>
+
+			<button class="pf-button secondary oauth-button" type="button" [disabled]="busyOAuth()" (click)="loginWithDemoOAuth()">
+				Entrar com OAuth2 demo
+			</button>
+
+			@if (error()) {
+				<p class="feedback error">{{ error() }}</p>
+			}
+			@if (feedback()) {
+				<p class="feedback success">{{ feedback() }}</p>
+			}
+		</section>
+
+		<section class="pf-card profile-panel" appRevealOnScroll [revealDelay]="160">
+			<header class="profile-head">
+				<h2>Perfil e sessao</h2>
+				<span class="pf-pill">Tenant ativo</span>
+			</header>
+
+			@if (sessionService.isAuthenticated()) {
+				<p class="session-meta">
+					Sessao autenticada para <strong>{{ userEmail() }}</strong>
+				</p>
+
+				<form class="auth-form" [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+					<label>
+						<span>Nome do perfil</span>
+						<input type="text" formControlName="fullName" placeholder="Nome exibido no perfil" />
+					</label>
+					<button class="pf-button" type="submit" [disabled]="loading()">Salvar perfil</button>
+				</form>
+
+				@if (profile()) {
+					<ul class="profile-list">
+						<li><span>UserId:</span> {{ profile()!.userId }}</li>
+						<li><span>Nome:</span> {{ profile()!.fullName }}</li>
+						<li><span>Email:</span> {{ profile()!.email }}</li>
+					</ul>
+				}
+
+				<div class="profile-actions">
+					<a class="pf-button secondary" routerLink="/finance">Abrir contas</a>
+					<button class="pf-button secondary" type="button" (click)="logout()">Encerrar sessao</button>
+				</div>
+			} @else {
+				<p class="session-meta">
+					Voce ainda nao tem sessao ativa. Faca login ou cadastro para liberar a gestao de perfil e contas.
+				</p>
+			}
+		</section>
+	</article>
+
 	<article class="pf-feature-grid">
-		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="80">
-			<h3>Cadastro guiado</h3>
-			<p>Reducao de friccao para novos usuarios com validacoes claras e experiencia direta.</p>
+		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="220">
+			<h3>Token e refresh</h3>
+			<p>Fluxo de sessao preparado para renovacao de token e encerramento seguro.</p>
 		</section>
-		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="160">
-			<h3>OAuth2 e perfis</h3>
-			<p>Integracao de provedores externos com regras de acesso alinhadas ao contexto de negocio.</p>
+		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="260">
+			<h3>OAuth2 simplificado</h3>
+			<p>Onboarding social no provider demo para validar integracao sem friccao inicial.</p>
 		</section>
-		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="240">
-			<h3>Isolamento global</h3>
-			<p>Protecao de dados por usuario para manter seguranca e privacidade entre contas.</p>
+		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="300">
+			<h3>Perfil conectado</h3>
+			<p>Dados de perfil atualizados em tempo real para manter consistencia de identidade.</p>
 		</section>
 	</article>
 </section>

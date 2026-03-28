@@ -113,6 +113,17 @@ Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com cenarios de a
 Riscos: Endpoints legacy que venham a ser adicionados sem autorizacao explicita podem contornar isolamento; manter politica de endpoints autenticados e testes de seguranca por recurso.
 Proximo passo: Iniciar Fase 03, TASK-01.
 
+#### 2026-03-28
+Data: 2026-03-28
+Fase: 02 - Identidade e Multi-Tenancy
+Task: Complemento Frontend - Telas de Identidade, Perfil e Contas
+Resumo: Implementacao das telas funcionais de autenticacao (login, cadastro e OAuth2 demo), perfil (consulta e atualizacao) e gestao de contas (listar, criar, renomear e excluir), com sessao persistida, interceptor de token com refresh e aderencia ao guia visual de identidade frontend.
+Evidencias: src/frontend/src/app/features/auth/auth-shell/auth-shell.ts; src/frontend/src/app/features/finance/finance-shell/finance-shell.ts; src/frontend/src/app/core/auth/auth-api.service.ts; src/frontend/src/app/core/finance/accounts-api.service.ts.
+Testes Unitarios: npm run test em src/frontend com 13 testes aprovados cobrindo componentes atualizados (auth, finance e navegacao).
+Testes de Integracao: Validacao de fluxo frontend-endpoint via consumo real dos contratos HTTP de auth/profile/accounts (sucesso e erro) exercitados em tela e protegidos por interceptor de sessao.
+Riscos: Para ambiente local, pode ser necessario configurar proxy de API no Angular para evitar problema de CORS quando backend e frontend estiverem em hosts/portas diferentes.
+Proximo passo: Iniciar Fase 03, TASK-01 mantendo padrao de UI e TDD no frontend.
+
 ## Decisoes Arquiteturais Relevantes
 
 | Data | Decisao | Impacto | Justificativa |
