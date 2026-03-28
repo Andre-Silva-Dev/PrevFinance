@@ -15,7 +15,7 @@ Use este documento para manter rastreabilidade entre planejamento, execucao e en
 | Fase | Nome | Status | Inicio | Fim | Responsavel | Observacoes |
 | --- | --- | --- | --- | --- | --- | --- |
 | 01 | Fundacao e Arquitetura | Concluida | 2026-03-27 | 2026-03-27 | Andre Silva | TASK-01, TASK-02 e TASK-03 concluidas com testes |
-| 02 | Identidade e Multi-Tenancy | Nao iniciada | - | - | - | - |
+| 02 | Identidade e Multi-Tenancy | Concluida | 2026-03-28 | 2026-03-28 | Andre Silva | TASK-01, TASK-02 e TASK-03 concluidas com testes |
 | 03 | Contas, Transacoes e Parcelamento | Nao iniciada | - | - | - | - |
 | 04 | Projecoes e Dashboard | Nao iniciada | - | - | - | - |
 | 05 | Quitacao de Dividas e Simulacoes | Nao iniciada | - | - | - | - |
@@ -80,11 +80,45 @@ Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com cenarios de s
 Riscos: Nenhum risco tecnico residual relevante para a modelagem inicial.
 Proximo passo: Iniciar Fase 02, TASK-01.
 
+#### 2026-03-28
+Data: 2026-03-28
+Fase: 02 - Identidade e Multi-Tenancy
+Task: TASK-01 - Implementar Cadastro e Login
+Resumo: Implementacao de endpoints de autenticacao para cadastro, login, refresh e logout com JWT + refresh token, hash de senha PBKDF2, rota protegida /api/auth/me e migration para credenciais e refresh tokens.
+Evidencias: src/backend/PrevFinance.Api/Auth/AuthEndpoints.cs; src/backend/PrevFinance.Api/Auth/JwtTokenService.cs; src/backend/PrevFinance.Infrastructure/Persistence/Migrations/20260328114530_AddAuthCredentialsAndRefreshTokens.cs; commit fe9a15f.
+Testes Unitarios: dotnet test src/backend/PrevFinance.slnx com testes de hash de senha e validacoes de dominio (sucesso e erro) aprovados.
+Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com fluxo de cadastro/login/refresh/logout e erro de autenticacao aprovados.
+Riscos: Chave JWT de desenvolvimento esta em appsettings e deve ser substituida por secret manager em ambiente produtivo.
+Proximo passo: Executar TASK-02 para OAuth2 e perfis.
+
+#### 2026-03-28
+Data: 2026-03-28
+Fase: 02 - Identidade e Multi-Tenancy
+Task: TASK-02 - Integrar OAuth2 e Perfis
+Resumo: Implementacao de callback OAuth2 por authorization code com provedor demo, vinculacao de conta externa ao usuario interno sem duplicar usuario por email, API de perfil (consulta e atualizacao) e migration para metadados externos.
+Evidencias: src/backend/PrevFinance.Api/Auth/DemoOAuth2ProviderClient.cs; src/backend/PrevFinance.Api/Profile/ProfileEndpoints.cs; src/backend/PrevFinance.Infrastructure/Persistence/Migrations/20260328114745_AddOAuth2IdentitySupport.cs; commit a1e721b.
+Testes Unitarios: dotnet test src/backend/PrevFinance.slnx com validacoes de dominio para update de perfil e suporte de credencial local/OAuth2 aprovados.
+Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com fluxo OAuth2 valido/invalido, ausencia de duplicacao por email e API de perfil (sucesso e erro) aprovados.
+Riscos: Provedor OAuth2 demo e util para desenvolvimento e testes; integracao produtiva deve configurar provider externo real mantendo o contrato do callback.
+Proximo passo: Executar TASK-03 para isolamento global por UserId.
+
+#### 2026-03-28
+Data: 2026-03-28
+Fase: 02 - Identidade e Multi-Tenancy
+Task: TASK-03 - Aplicar Isolamento Global por UserId
+Resumo: Propagacao do contexto autenticado ate a camada de dados com filtro global por UserId em Profile, Account, Transaction e RefreshToken; endpoints de conta protegidos com guardas de ownership em read/update/delete e logs de auditoria para negacoes.
+Evidencias: src/backend/PrevFinance.Infrastructure/Persistence/PrevFinanceDbContext.cs; src/backend/PrevFinance.Api/Finance/AccountEndpoints.cs; src/backend/PrevFinance.IntegrationTests/Finance/AccountIsolationIntegrationTests.cs; commit a8fd3fe.
+Testes Unitarios: dotnet test src/backend/PrevFinance.slnx com cenarios de sucesso e erro de validacao de entidades (incluindo rename de conta) aprovados.
+Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com cenarios de acesso cruzado bloqueado (list/read/update/delete) e fluxo autorizado por usuario aprovados.
+Riscos: Endpoints legacy que venham a ser adicionados sem autorizacao explicita podem contornar isolamento; manter politica de endpoints autenticados e testes de seguranca por recurso.
+Proximo passo: Iniciar Fase 03, TASK-01.
+
 ## Decisoes Arquiteturais Relevantes
 
 | Data | Decisao | Impacto | Justificativa |
 | --- | --- | --- | --- |
 | 2026-03-27 | Adotar fases independentes por dominio funcional | Facilita paralelismo e previsibilidade de entrega | Alinhado ao PRD e ao MVP |
+| 2026-03-28 | Isolamento multi-tenant aplicado por query filter global no DbContext com UserId do contexto autenticado | Reduz risco de vazamento entre tenants nas consultas da camada de dados | Alinha FR1/NFR2 com controle centralizado e testavel |
 
 ## Backlog de Riscos
 
