@@ -10,6 +10,7 @@ export interface AccountResponseDto {
   type: AccountType;
   initialBalance: number;
   currentBalance: number;
+  effectiveBalance: number;
 }
 
 export interface AccountBalanceAdjustmentResponseDto {

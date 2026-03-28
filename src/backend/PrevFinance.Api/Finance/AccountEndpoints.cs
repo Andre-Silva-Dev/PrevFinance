@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrevFinance.Application.Abstractions;
 using PrevFinance.Domain.Accounts;
+using PrevFinance.Domain.Transactions;
 using PrevFinance.Infrastructure.Persistence;
 
 namespace PrevFinance.Api.Finance;
@@ -42,18 +43,36 @@ public static class AccountEndpoints
         dbContext.Accounts.Add(account);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Results.Created($"/api/accounts/{account.Id}", ToResponse(account));
+        return Results.Created($"/api/accounts/{account.Id}", ToResponse(account, account.CurrentBalance));
     }
 
     [Authorize]
-    private static async Task<IResult> ListAsync(PrevFinanceDbContext dbContext, CancellationToken cancellationToken)
+    private static async Task<IResult> ListAsync(
+        PrevFinanceDbContext dbContext,
+        ClaimsPrincipal claimsPrincipal,
+        ISystemClock clock,
+        CancellationToken cancellationToken)
     {
+        if (!TryReadUserId(claimsPrincipal, out var userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        await MarkPendingAsOverdueAsync(dbContext, userId, DateOnly.FromDateTime(clock.UtcNow.Date), cancellationToken);
+
+        var effectiveDeltaByAccount = await CalculateEffectiveDeltaByAccountAsync(dbContext, cancellationToken);
+
         var items = await dbContext.Accounts
             .OrderBy(x => x.Name)
-            .Select(x => ToResponse(x))
             .ToListAsync(cancellationToken);
 
-        return Results.Ok(items);
+        var response = items
+            .Select(account => ToResponse(
+                account,
+                account.CurrentBalance + effectiveDeltaByAccount.GetValueOrDefault(account.Id, 0m)))
+            .ToList();
+
+        return Results.Ok(response);
     }
 
     [Authorize]
@@ -79,7 +98,10 @@ public static class AccountEndpoints
             return Results.NotFound();
         }
 
-        return Results.Ok(ToResponse(account));
+        await MarkPendingAsOverdueAsync(dbContext, userId, DateOnly.FromDateTime(DateTime.UtcNow.Date), cancellationToken);
+
+        var effectiveDelta = await CalculateEffectiveDeltaAsync(dbContext, account.Id, cancellationToken);
+        return Results.Ok(ToResponse(account, account.CurrentBalance + effectiveDelta));
     }
 
     [Authorize]
@@ -109,7 +131,8 @@ public static class AccountEndpoints
         account.Rename(request.Name);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Results.Ok(ToResponse(account));
+        var effectiveDelta = await CalculateEffectiveDeltaAsync(dbContext, account.Id, cancellationToken);
+        return Results.Ok(ToResponse(account, account.CurrentBalance + effectiveDelta));
     }
 
     [Authorize]
@@ -155,7 +178,8 @@ public static class AccountEndpoints
         dbContext.AccountBalanceAdjustments.Add(adjustment);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Results.Ok(ToResponse(account));
+        var effectiveDelta = await CalculateEffectiveDeltaAsync(dbContext, account.Id, cancellationToken);
+        return Results.Ok(ToResponse(account, account.CurrentBalance + effectiveDelta));
     }
 
     [Authorize]
@@ -231,9 +255,65 @@ public static class AccountEndpoints
         return Guid.TryParse(claimValue, out userId);
     }
 
-    private static AccountResponse ToResponse(Account account)
+    private static AccountResponse ToResponse(Account account, decimal effectiveBalance)
     {
-        return new AccountResponse(account.Id, account.Name, account.Type, account.InitialBalance, account.CurrentBalance);
+        return new AccountResponse(
+            account.Id,
+            account.Name,
+            account.Type,
+            account.InitialBalance,
+            account.CurrentBalance,
+            effectiveBalance);
+    }
+
+    private static async Task MarkPendingAsOverdueAsync(
+        PrevFinanceDbContext dbContext,
+        Guid userId,
+        DateOnly today,
+        CancellationToken cancellationToken)
+    {
+        var candidates = await dbContext.Transactions
+            .Where(x => x.UserId == userId && x.Status == TransactionStatus.Pending && x.OccurredOn < today)
+            .ToListAsync(cancellationToken);
+
+        var changed = false;
+        foreach (var item in candidates)
+        {
+            changed |= item.MarkAsOverdueIfPastDue(today);
+        }
+
+        if (changed)
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    private static async Task<decimal> CalculateEffectiveDeltaAsync(
+        PrevFinanceDbContext dbContext,
+        Guid accountId,
+        CancellationToken cancellationToken)
+    {
+        return await dbContext.Transactions
+            .Where(x => x.AccountId == accountId)
+            .Where(x => x.Status == TransactionStatus.Pending || x.Status == TransactionStatus.Overdue)
+            .Where(x => x.OccurredOn <= DateOnly.FromDateTime(DateTime.UtcNow.Date))
+            .SumAsync(x => x.Type == TransactionType.Income ? x.Amount : -x.Amount, cancellationToken);
+    }
+
+    private static async Task<Dictionary<Guid, decimal>> CalculateEffectiveDeltaByAccountAsync(
+        PrevFinanceDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        return await dbContext.Transactions
+            .Where(x => x.Status == TransactionStatus.Pending || x.Status == TransactionStatus.Overdue)
+            .Where(x => x.OccurredOn <= DateOnly.FromDateTime(DateTime.UtcNow.Date))
+            .GroupBy(x => x.AccountId)
+            .Select(group => new
+            {
+                AccountId = group.Key,
+                Delta = group.Sum(x => x.Type == TransactionType.Income ? x.Amount : -x.Amount)
+            })
+            .ToDictionaryAsync(x => x.AccountId, x => x.Delta, cancellationToken);
     }
 
     public sealed record CreateAccountRequest(string Name, AccountType Type, decimal InitialBalance);
@@ -242,7 +322,13 @@ public static class AccountEndpoints
 
     public sealed record RecalibrateBalanceRequest(decimal NewBalance, string Reason);
 
-    public sealed record AccountResponse(Guid Id, string Name, AccountType Type, decimal InitialBalance, decimal CurrentBalance);
+    public sealed record AccountResponse(
+        Guid Id,
+        string Name,
+        AccountType Type,
+        decimal InitialBalance,
+        decimal CurrentBalance,
+        decimal EffectiveBalance);
 
     public sealed record AccountBalanceAdjustmentResponse(
         Guid Id,

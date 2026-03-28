@@ -159,10 +159,49 @@
 									<strong>{{ formatCurrency(item.amount) }}</strong>
 								</p>
 								<p>Vencimento: {{ item.dueOn | date:'dd/MM/yyyy' }} • Status: {{ item.status }}</p>
+								<button class="pf-button secondary" type="button" (click)="preloadInstallmentEdit(item)">
+									Editar parcela
+								</button>
 							</li>
 						}
 					</ul>
 				}
+			</section>
+
+			<section class="pf-card finance-panel" appRevealOnScroll [revealDelay]="260">
+				<h2>Editar parcela</h2>
+				<form class="finance-form" [formGroup]="editInstallmentForm" (ngSubmit)="updateInstallment()">
+					<label>
+						<span>Parcela selecionada</span>
+						<select formControlName="transactionId">
+							<option value="">Selecione uma parcela</option>
+							@if (generatedInstallmentPlan(); as plan) {
+								@for (item of plan.installments; track item.id) {
+									<option [value]="item.id">{{ item.number }}/{{ item.total }} - {{ item.status }}</option>
+								}
+							}
+						</select>
+					</label>
+					<label>
+						<span>Novo valor</span>
+						<input type="number" formControlName="amount" step="0.01" />
+					</label>
+					<label>
+						<span>Novo vencimento</span>
+						<input type="date" formControlName="dueOn" />
+					</label>
+					<label>
+						<span>Descricao</span>
+						<input type="text" formControlName="description" />
+					</label>
+					<label class="inline-check">
+						<input type="checkbox" formControlName="applyToFutureInSeries" />
+						<span>Aplicar em cascata nas proximas parcelas</span>
+					</label>
+					<button class="pf-button secondary" type="submit" [disabled]="actionLoading()">
+						Salvar edicao
+					</button>
+				</form>
 			</section>
 		</article>
 
@@ -194,6 +233,7 @@
 						</header>
 						<p>Saldo inicial: <strong>{{ formatCurrency(account.initialBalance) }}</strong></p>
 						<p>Saldo atual: <strong>{{ formatCurrency(account.currentBalance) }}</strong></p>
+						<p>Saldo efetivo: <strong>{{ formatCurrency(account.effectiveBalance) }}</strong></p>
 						<div class="account-actions">
 							<button class="pf-button secondary" type="button" (click)="preloadRename(account)">Editar</button>
 							<button class="pf-button secondary" type="button" (click)="preloadRecalibration(account)">Recalibrar</button>

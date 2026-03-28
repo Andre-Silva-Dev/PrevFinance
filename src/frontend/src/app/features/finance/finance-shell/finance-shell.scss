@@ -168,12 +168,24 @@
 	border-radius: 10px;
 	padding: 0.55rem 0.65rem;
 	background: rgba(5, 26, 49, 0.48);
+	display: grid;
+	gap: 0.45rem;
 }
 
 .installment-list p {
 	margin: 0;
 	font-size: 0.8rem;
 	color: var(--color-text-soft);
+}
+
+.inline-check {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+}
+
+.inline-check input {
+	width: auto;
 }
 
 @media (max-width: 920px) {

@@ -137,4 +137,43 @@ public class DomainEntityValidationTests
         plan.InstallmentCount.Should().Be(12);
         plan.Frequency.Should().Be(InstallmentFrequency.Monthly);
     }
+
+    [Fact]
+    public void Transaction_Update_ShouldApplyProvidedFields_WhenValuesAreValid()
+    {
+        var account = Account.Create(Guid.NewGuid(), Guid.NewGuid(), "Conta", AccountType.Checking, 1000m);
+        var transaction = Transaction.Create(
+            Guid.NewGuid(),
+            account.UserId,
+            account.Id,
+            100m,
+            new DateOnly(2026, 1, 10),
+            TransactionType.Expense,
+            "Original");
+
+        transaction.Update(amount: 120m, dueOn: new DateOnly(2026, 1, 12), description: "Atualizada");
+
+        transaction.Amount.Should().Be(120m);
+        transaction.OccurredOn.Should().Be(new DateOnly(2026, 1, 12));
+        transaction.Description.Should().Be("Atualizada");
+    }
+
+    [Fact]
+    public void Transaction_MarkAsOverdue_ShouldSetStatusToOverdue_WhenPendingAndPastDue()
+    {
+        var account = Account.Create(Guid.NewGuid(), Guid.NewGuid(), "Conta", AccountType.Checking, 1000m);
+        var transaction = Transaction.Create(
+            Guid.NewGuid(),
+            account.UserId,
+            account.Id,
+            90m,
+            DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-2)),
+            TransactionType.Expense,
+            "Conta antiga");
+
+        var changed = transaction.MarkAsOverdueIfPastDue(DateOnly.FromDateTime(DateTime.UtcNow.Date));
+
+        changed.Should().BeTrue();
+        transaction.Status.Should().Be(TransactionStatus.Overdue);
+    }
 }
