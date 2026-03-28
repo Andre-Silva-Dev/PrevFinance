@@ -97,4 +97,44 @@ public class DomainEntityValidationTests
         // Assert
         action.Should().Throw<ArgumentOutOfRangeException>();
     }
+
+    [Fact]
+    public void InstallmentPlan_Create_ShouldThrow_WhenInstallmentCountIsInvalid()
+    {
+        var account = Account.Create(Guid.NewGuid(), Guid.NewGuid(), "Conta", AccountType.Checking, 1000m);
+
+        var action = () => InstallmentPlan.Create(
+            Guid.NewGuid(),
+            account.UserId,
+            account.Id,
+            1200m,
+            0,
+            new DateOnly(2026, 1, 31),
+            InstallmentFrequency.Monthly,
+            "Notebook",
+            TransactionType.Expense);
+
+        action.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void InstallmentPlan_Create_ShouldReturnEntity_WhenDataIsValid()
+    {
+        var account = Account.Create(Guid.NewGuid(), Guid.NewGuid(), "Conta", AccountType.Checking, 1000m);
+
+        var plan = InstallmentPlan.Create(
+            Guid.NewGuid(),
+            account.UserId,
+            account.Id,
+            1200m,
+            12,
+            new DateOnly(2026, 1, 31),
+            InstallmentFrequency.Monthly,
+            "Notebook",
+            TransactionType.Expense);
+
+        plan.TotalAmount.Should().Be(1200m);
+        plan.InstallmentCount.Should().Be(12);
+        plan.Frequency.Should().Be(InstallmentFrequency.Monthly);
+    }
 }

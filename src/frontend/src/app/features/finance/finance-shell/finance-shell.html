@@ -100,6 +100,70 @@
 					</ul>
 				}
 			</section>
+
+			<section class="pf-card finance-panel" appRevealOnScroll [revealDelay]="220">
+				<h2>Novo parcelamento</h2>
+				<form class="finance-form" [formGroup]="installmentForm" (ngSubmit)="createInstallmentPlan()">
+					<label>
+						<span>Conta</span>
+						<select formControlName="accountId">
+							<option value="">Selecione uma conta</option>
+							@for (account of accounts(); track account.id) {
+								<option [value]="account.id">{{ account.name }}</option>
+							}
+						</select>
+					</label>
+					<label>
+						<span>Valor total</span>
+						<input type="number" formControlName="totalAmount" step="0.01" />
+					</label>
+					<label>
+						<span>Numero de parcelas</span>
+						<input type="number" formControlName="installmentCount" min="2" />
+					</label>
+					<label>
+						<span>Data inicial</span>
+						<input type="date" formControlName="startDate" />
+					</label>
+					<label>
+						<span>Frequencia</span>
+						<select formControlName="frequency">
+							@for (frequency of installmentFrequencies; track frequency) {
+								<option [value]="frequency">{{ frequency }}</option>
+							}
+						</select>
+					</label>
+					<label>
+						<span>Tipo</span>
+						<select formControlName="type">
+							@for (type of transactionTypes; track type) {
+								<option [value]="type">{{ type }}</option>
+							}
+						</select>
+					</label>
+					<label>
+						<span>Descricao</span>
+						<input type="text" formControlName="description" placeholder="Compra parcelada" />
+					</label>
+					<button class="pf-button secondary" type="submit" [disabled]="actionLoading()">
+						Gerar parcelas
+					</button>
+				</form>
+
+				@if (generatedInstallmentPlan(); as plan) {
+					<ul class="installment-list">
+						@for (item of plan.installments; track item.id) {
+							<li>
+								<p>
+									Parcela {{ item.number }}/{{ item.total }}
+									<strong>{{ formatCurrency(item.amount) }}</strong>
+								</p>
+								<p>Vencimento: {{ item.dueOn | date:'dd/MM/yyyy' }} • Status: {{ item.status }}</p>
+							</li>
+						}
+					</ul>
+				}
+			</section>
 		</article>
 
 		@if (error()) {

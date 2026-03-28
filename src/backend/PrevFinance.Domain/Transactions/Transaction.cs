@@ -11,7 +11,11 @@ public sealed class Transaction : AuditableEntity
         decimal amount,
         DateOnly occurredOn,
         TransactionType type,
-        string description) : base(id)
+        string description,
+        TransactionStatus status,
+        Guid? installmentPlanId,
+        int? installmentNumber,
+        int? installmentCount) : base(id)
     {
         if (userId == Guid.Empty)
         {
@@ -39,6 +43,10 @@ public sealed class Transaction : AuditableEntity
         OccurredOn = occurredOn;
         Type = type;
         Description = description.Trim();
+        Status = status;
+        InstallmentPlanId = installmentPlanId;
+        InstallmentNumber = installmentNumber;
+        InstallmentCount = installmentCount;
     }
 
     private Transaction() : base(Guid.NewGuid())
@@ -58,6 +66,14 @@ public sealed class Transaction : AuditableEntity
 
     public string Description { get; private set; }
 
+    public TransactionStatus Status { get; private set; }
+
+    public Guid? InstallmentPlanId { get; private set; }
+
+    public int? InstallmentNumber { get; private set; }
+
+    public int? InstallmentCount { get; private set; }
+
     public static Transaction Create(
         Guid id,
         Guid userId,
@@ -65,8 +81,23 @@ public sealed class Transaction : AuditableEntity
         decimal amount,
         DateOnly occurredOn,
         TransactionType type,
-        string description)
+        string description,
+        TransactionStatus status = TransactionStatus.Pending,
+        Guid? installmentPlanId = null,
+        int? installmentNumber = null,
+        int? installmentCount = null)
     {
-        return new Transaction(id, userId, accountId, amount, occurredOn, type, description);
+        return new Transaction(
+            id,
+            userId,
+            accountId,
+            amount,
+            occurredOn,
+            type,
+            description,
+            status,
+            installmentPlanId,
+            installmentNumber,
+            installmentCount);
     }
 }

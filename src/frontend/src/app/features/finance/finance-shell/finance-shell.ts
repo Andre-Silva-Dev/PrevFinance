@@ -10,6 +10,12 @@ import {
   AccountType,
   AccountsApiService
 } from '../../../core/finance/accounts-api.service';
+import {
+  InstallmentFrequency,
+  InstallmentPlanResponseDto,
+  InstallmentsApiService,
+  TransactionType
+} from '../../../core/finance/installments-api.service';
 import { RevealOnScrollDirective } from '../../../shared/directives/reveal-on-scroll.directive';
 
 @Component({
@@ -21,6 +27,7 @@ import { RevealOnScrollDirective } from '../../../shared/directives/reveal-on-sc
 export class FinanceShell {
   private readonly formBuilder = inject(FormBuilder);
   private readonly accountsApi = inject(AccountsApiService);
+  private readonly installmentsApi = inject(InstallmentsApiService);
   protected readonly sessionService = inject(AuthSessionService);
 
   protected readonly loading = signal(false);
@@ -29,8 +36,11 @@ export class FinanceShell {
   protected readonly error = signal<string | null>(null);
   protected readonly accounts = signal<AccountResponseDto[]>([]);
   protected readonly selectedAccountAdjustments = signal<AccountBalanceAdjustmentResponseDto[]>([]);
+  protected readonly generatedInstallmentPlan = signal<InstallmentPlanResponseDto | null>(null);
 
   protected readonly accountTypes: AccountType[] = ['Checking', 'Savings', 'CreditCard', 'Wallet'];
+  protected readonly installmentFrequencies: InstallmentFrequency[] = ['Monthly', 'Weekly'];
+  protected readonly transactionTypes: TransactionType[] = ['Income', 'Expense'];
 
   protected readonly createForm = this.formBuilder.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
@@ -47,6 +57,16 @@ export class FinanceShell {
     accountId: ['', [Validators.required]],
     newBalance: [0, [Validators.required]],
     reason: ['', [Validators.required, Validators.minLength(3)]]
+  });
+
+  protected readonly installmentForm = this.formBuilder.group({
+    accountId: ['', [Validators.required]],
+    totalAmount: [0, [Validators.required, Validators.min(0.01)]],
+    installmentCount: [2, [Validators.required, Validators.min(2)]],
+    startDate: ['', [Validators.required]],
+    frequency: ['Monthly' as InstallmentFrequency, [Validators.required]],
+    description: ['', [Validators.required, Validators.minLength(3)]],
+    type: ['Expense' as TransactionType, [Validators.required]]
   });
 
   constructor() {
@@ -198,6 +218,38 @@ export class FinanceShell {
       next: (items) => this.selectedAccountAdjustments.set(items),
       error: () => this.error.set('Nao foi possivel carregar o historico de ajustes desta conta.')
     });
+  }
+
+  protected createInstallmentPlan(): void {
+    if (this.installmentForm.invalid) {
+      this.installmentForm.markAllAsTouched();
+      return;
+    }
+
+    const payload = this.installmentForm.getRawValue();
+    this.actionLoading.set(true);
+    this.feedback.set(null);
+    this.error.set(null);
+
+    this.installmentsApi
+      .create({
+        accountId: payload.accountId ?? '',
+        totalAmount: Number(payload.totalAmount ?? 0),
+        installmentCount: Number(payload.installmentCount ?? 0),
+        startDate: payload.startDate ?? '',
+        frequency: (payload.frequency ?? 'Monthly') as InstallmentFrequency,
+        description: payload.description ?? '',
+        type: (payload.type ?? 'Expense') as TransactionType
+      })
+      .pipe(finalize(() => this.actionLoading.set(false)))
+      .subscribe({
+        next: (plan) => {
+          this.generatedInstallmentPlan.set(plan);
+          this.feedback.set('Parcelamento criado com sucesso.');
+          this.installmentForm.patchValue({ description: '', totalAmount: 0, installmentCount: 2 });
+        },
+        error: () => this.error.set('Nao foi possivel criar o parcelamento. Revise os campos e tente novamente.')
+      });
   }
 
   protected formatCurrency(value: number): string {

@@ -3,6 +3,7 @@ import { of } from 'rxjs';
 import { provideRouter } from '@angular/router';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { AccountsApiService } from '../../../core/finance/accounts-api.service';
+import { InstallmentsApiService } from '../../../core/finance/installments-api.service';
 
 import { FinanceShell } from './finance-shell';
 
@@ -27,6 +28,20 @@ describe('FinanceShell', () => {
     delete: () => of(void 0)
   };
 
+  const installmentsApiMock = {
+    create: () => of({
+      id: 'p1',
+      accountId: 'a1',
+      totalAmount: 1200,
+      installmentCount: 12,
+      startDate: '2026-01-31',
+      frequency: 'Monthly',
+      description: 'Notebook',
+      type: 'Expense',
+      installments: []
+    })
+  };
+
   const sessionMock = {
     session: () => ({
       user: { userId: 'u1', email: 'user@prevfinance.app' },
@@ -40,6 +55,7 @@ describe('FinanceShell', () => {
       providers: [
         provideRouter([]),
         { provide: AccountsApiService, useValue: accountsApiMock },
+        { provide: InstallmentsApiService, useValue: installmentsApiMock },
         { provide: AuthSessionService, useValue: sessionMock }
       ]
     })
@@ -74,5 +90,21 @@ describe('FinanceShell', () => {
     component['recalibrateBalance']();
 
     expect(component['feedback']()).toContain('recalibrado');
+  });
+
+  it('should create installment plan when form is valid', () => {
+    component['installmentForm'].setValue({
+      accountId: 'a1',
+      totalAmount: 1200,
+      installmentCount: 12,
+      startDate: '2026-01-31',
+      frequency: 'Monthly',
+      description: 'Notebook',
+      type: 'Expense'
+    });
+
+    component['createInstallmentPlan']();
+
+    expect(component['generatedInstallmentPlan']()).not.toBeNull();
   });
 });

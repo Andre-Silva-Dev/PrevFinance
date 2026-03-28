@@ -93,6 +93,7 @@ app.UseAuthorization();
 app.MapAuthEndpoints();
 app.MapProfileEndpoints();
 app.MapAccountEndpoints();
+app.MapInstallmentEndpoints();
 app.MapHealthChecks("/health");
 app.MapHealthChecks("/health/ready");
 
