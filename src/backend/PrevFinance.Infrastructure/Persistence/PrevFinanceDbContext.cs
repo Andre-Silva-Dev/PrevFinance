@@ -29,6 +29,8 @@ public sealed class PrevFinanceDbContext : DbContext
 
     public DbSet<Transaction> Transactions => Set<Transaction>();
 
+    public DbSet<InstallmentPlan> InstallmentPlans => Set<InstallmentPlan>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PrevFinanceDbContext).Assembly);
@@ -43,6 +45,9 @@ public sealed class PrevFinanceDbContext : DbContext
             .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
 
         modelBuilder.Entity<Transaction>()
+            .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
+
+        modelBuilder.Entity<InstallmentPlan>()
             .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
 
         modelBuilder.Entity<RefreshToken>()

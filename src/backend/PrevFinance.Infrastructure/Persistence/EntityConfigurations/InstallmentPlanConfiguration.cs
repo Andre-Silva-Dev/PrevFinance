@@ -6,23 +6,26 @@ using PrevFinance.Domain.Users;
 
 namespace PrevFinance.Infrastructure.Persistence.EntityConfigurations;
 
-internal sealed class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
+internal sealed class InstallmentPlanConfiguration : IEntityTypeConfiguration<InstallmentPlan>
 {
-    public void Configure(EntityTypeBuilder<Transaction> builder)
+    public void Configure(EntityTypeBuilder<InstallmentPlan> builder)
     {
-        builder.ToTable("transactions");
+        builder.ToTable("installment_plans");
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Amount)
+        builder.Property(x => x.TotalAmount)
             .HasPrecision(18, 2)
             .IsRequired();
 
-        builder.Property(x => x.Type)
-            .HasConversion<int>()
+        builder.Property(x => x.InstallmentCount)
             .IsRequired();
 
-        builder.Property(x => x.Status)
+        builder.Property(x => x.StartDate)
+            .HasColumnType("date")
+            .IsRequired();
+
+        builder.Property(x => x.Frequency)
             .HasConversion<int>()
             .IsRequired();
 
@@ -30,8 +33,8 @@ internal sealed class TransactionConfiguration : IEntityTypeConfiguration<Transa
             .HasMaxLength(240)
             .IsRequired();
 
-        builder.Property(x => x.OccurredOn)
-            .HasColumnType("date")
+        builder.Property(x => x.Type)
+            .HasConversion<int>()
             .IsRequired();
 
         builder.Property(x => x.CreatedAtUtc)
@@ -42,9 +45,7 @@ internal sealed class TransactionConfiguration : IEntityTypeConfiguration<Transa
             .HasColumnName("updated_at_utc")
             .IsRequired();
 
-        builder.HasIndex(x => new { x.UserId, x.OccurredOn });
-        builder.HasIndex(x => x.InstallmentPlanId);
-        builder.HasIndex(x => x.AccountId);
+        builder.HasIndex(x => new { x.UserId, x.StartDate });
 
         builder.HasOne<User>()
             .WithMany()
@@ -55,10 +56,5 @@ internal sealed class TransactionConfiguration : IEntityTypeConfiguration<Transa
             .WithMany()
             .HasForeignKey(x => x.AccountId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne<InstallmentPlan>()
-            .WithMany()
-            .HasForeignKey(x => x.InstallmentPlanId)
-            .OnDelete(DeleteBehavior.SetNull);
     }
 }

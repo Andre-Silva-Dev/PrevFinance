@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PrevFinance.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using PrevFinance.Infrastructure.Persistence;
 namespace PrevFinance.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(PrevFinanceDbContext))]
-    partial class PrevFinanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260328124827_AddInstallmentPlanAndTransactionStatus")]
+    partial class AddInstallmentPlanAndTransactionStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
