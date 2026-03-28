@@ -25,6 +25,10 @@ internal sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasPrecision(18, 2)
             .IsRequired();
 
+        builder.Property(x => x.CurrentBalance)
+            .HasPrecision(18, 2)
+            .IsRequired();
+
         builder.Property(x => x.CreatedAtUtc)
             .HasColumnName("created_at_utc")
             .IsRequired();

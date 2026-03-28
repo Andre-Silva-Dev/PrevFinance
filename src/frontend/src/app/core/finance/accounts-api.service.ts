@@ -9,6 +9,16 @@ export interface AccountResponseDto {
   name: string;
   type: AccountType;
   initialBalance: number;
+  currentBalance: number;
+}
+
+export interface AccountBalanceAdjustmentResponseDto {
+  id: string;
+  accountId: string;
+  previousBalance: number;
+  newBalance: number;
+  reason: string;
+  adjustedAtUtc: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +36,14 @@ export class AccountsApiService {
 
   update(accountId: string, payload: { name: string }): Observable<AccountResponseDto> {
     return this.http.put<AccountResponseDto>(`${this.baseUrl}/${accountId}`, payload);
+  }
+
+  recalibrate(accountId: string, payload: { newBalance: number; reason: string }): Observable<AccountResponseDto> {
+    return this.http.post<AccountResponseDto>(`${this.baseUrl}/${accountId}/recalibrate`, payload);
+  }
+
+  listAdjustments(accountId: string): Observable<AccountBalanceAdjustmentResponseDto[]> {
+    return this.http.get<AccountBalanceAdjustmentResponseDto[]>(`${this.baseUrl}/${accountId}/adjustments`);
   }
 
   delete(accountId: string): Observable<void> {

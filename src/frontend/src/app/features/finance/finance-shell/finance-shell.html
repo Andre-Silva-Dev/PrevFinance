@@ -60,6 +60,46 @@
 					</button>
 				</form>
 			</section>
+
+			<section class="pf-card finance-panel" appRevealOnScroll [revealDelay]="180">
+				<h2>Recalibrar saldo</h2>
+				<form class="finance-form" [formGroup]="recalibrateForm" (ngSubmit)="recalibrateBalance()">
+					<label>
+						<span>Conta selecionada</span>
+						<select formControlName="accountId" (change)="loadAdjustmentHistory($any($event.target).value)">
+							<option value="">Selecione uma conta</option>
+							@for (account of accounts(); track account.id) {
+								<option [value]="account.id">{{ account.name }}</option>
+							}
+						</select>
+					</label>
+					<label>
+						<span>Novo saldo real</span>
+						<input type="number" formControlName="newBalance" step="0.01" />
+					</label>
+					<label>
+						<span>Motivo do ajuste</span>
+						<input type="text" formControlName="reason" placeholder="Ajuste conforme extrato" />
+					</label>
+					<button class="pf-button secondary" type="submit" [disabled]="actionLoading()">
+						Aplicar recalibracao
+					</button>
+				</form>
+
+				@if (selectedAccountAdjustments().length > 0) {
+					<ul class="adjustment-list">
+						@for (item of selectedAccountAdjustments(); track item.id) {
+							<li>
+								<p>
+									De <strong>{{ formatCurrency(item.previousBalance) }}</strong>
+									para <strong>{{ formatCurrency(item.newBalance) }}</strong>
+								</p>
+								<p>{{ item.reason }} • {{ formatDateTime(item.adjustedAtUtc) }}</p>
+							</li>
+						}
+					</ul>
+				}
+			</section>
 		</article>
 
 		@if (error()) {
@@ -89,8 +129,10 @@
 							<span class="pf-pill">{{ account.type }}</span>
 						</header>
 						<p>Saldo inicial: <strong>{{ formatCurrency(account.initialBalance) }}</strong></p>
+						<p>Saldo atual: <strong>{{ formatCurrency(account.currentBalance) }}</strong></p>
 						<div class="account-actions">
 							<button class="pf-button secondary" type="button" (click)="preloadRename(account)">Editar</button>
+							<button class="pf-button secondary" type="button" (click)="preloadRecalibration(account)">Recalibrar</button>
 							<button class="pf-button secondary" type="button" (click)="deleteAccount(account.id)">Excluir</button>
 						</div>
 					</section>
