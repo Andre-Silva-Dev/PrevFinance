@@ -12,10 +12,12 @@ import {
 } from '../../../core/finance/accounts-api.service';
 import {
   InstallmentFrequency,
+  InstallmentTransactionResponseDto,
   InstallmentPlanResponseDto,
   InstallmentsApiService,
   TransactionType
 } from '../../../core/finance/installments-api.service';
+import { TransactionsApiService } from '../../../core/finance/transactions-api.service';
 import { RevealOnScrollDirective } from '../../../shared/directives/reveal-on-scroll.directive';
 
 @Component({
@@ -28,6 +30,7 @@ export class FinanceShell {
   private readonly formBuilder = inject(FormBuilder);
   private readonly accountsApi = inject(AccountsApiService);
   private readonly installmentsApi = inject(InstallmentsApiService);
+  private readonly transactionsApi = inject(TransactionsApiService);
   protected readonly sessionService = inject(AuthSessionService);
 
   protected readonly loading = signal(false);
@@ -67,6 +70,14 @@ export class FinanceShell {
     frequency: ['Monthly' as InstallmentFrequency, [Validators.required]],
     description: ['', [Validators.required, Validators.minLength(3)]],
     type: ['Expense' as TransactionType, [Validators.required]]
+  });
+
+  protected readonly editInstallmentForm = this.formBuilder.group({
+    transactionId: ['', [Validators.required]],
+    amount: [0, [Validators.required, Validators.min(0.01)]],
+    dueOn: ['', [Validators.required]],
+    description: ['', [Validators.required, Validators.minLength(3)]],
+    applyToFutureInSeries: [false, [Validators.required]]
   });
 
   constructor() {
@@ -249,6 +260,66 @@ export class FinanceShell {
           this.installmentForm.patchValue({ description: '', totalAmount: 0, installmentCount: 2 });
         },
         error: () => this.error.set('Nao foi possivel criar o parcelamento. Revise os campos e tente novamente.')
+      });
+  }
+
+  protected preloadInstallmentEdit(item: InstallmentTransactionResponseDto): void {
+    this.editInstallmentForm.patchValue({
+      transactionId: item.id,
+      amount: item.amount,
+      dueOn: item.dueOn,
+      description: this.generatedInstallmentPlan()?.description ?? '',
+      applyToFutureInSeries: false
+    });
+  }
+
+  protected updateInstallment(): void {
+    if (this.editInstallmentForm.invalid) {
+      this.editInstallmentForm.markAllAsTouched();
+      return;
+    }
+
+    const payload = this.editInstallmentForm.getRawValue();
+    const transactionId = payload.transactionId ?? '';
+
+    this.actionLoading.set(true);
+    this.feedback.set(null);
+    this.error.set(null);
+
+    this.transactionsApi
+      .update(transactionId, {
+        amount: Number(payload.amount ?? 0),
+        dueOn: payload.dueOn ?? '',
+        description: payload.description ?? '',
+        applyToFutureInSeries: Boolean(payload.applyToFutureInSeries)
+      })
+      .pipe(finalize(() => this.actionLoading.set(false)))
+      .subscribe({
+        next: (updatedBatch) => {
+          const plan = this.generatedInstallmentPlan();
+          if (!plan) {
+            return;
+          }
+
+          const updateMap = new Map(updatedBatch.transactions.map((item) => [item.id, item]));
+          const mergedInstallments = plan.installments.map((installment) => {
+            const changed = updateMap.get(installment.id);
+            if (!changed) {
+              return installment;
+            }
+
+            return {
+              ...installment,
+              amount: changed.amount,
+              dueOn: changed.dueOn,
+              status: changed.status
+            };
+          });
+
+          this.generatedInstallmentPlan.set({ ...plan, installments: mergedInstallments });
+          this.feedback.set('Parcela atualizada com sucesso.');
+        },
+        error: () => this.error.set('Nao foi possivel atualizar a parcela. Revise os dados e tente novamente.')
       });
   }
 

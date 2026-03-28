@@ -100,4 +100,43 @@ public sealed class Transaction : AuditableEntity
             installmentNumber,
             installmentCount);
     }
+
+    public void Update(decimal? amount, DateOnly? dueOn, string? description)
+    {
+        if (amount.HasValue)
+        {
+            if (amount.Value <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be greater than zero.");
+            }
+
+            Amount = amount.Value;
+        }
+
+        if (dueOn.HasValue)
+        {
+            OccurredOn = dueOn.Value;
+        }
+
+        if (description is not null)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                throw new ArgumentException("Description is required.", nameof(description));
+            }
+
+            Description = description.Trim();
+        }
+    }
+
+    public bool MarkAsOverdueIfPastDue(DateOnly currentDate)
+    {
+        if (Status != TransactionStatus.Pending || OccurredOn >= currentDate)
+        {
+            return false;
+        }
+
+        Status = TransactionStatus.Overdue;
+        return true;
+    }
 }

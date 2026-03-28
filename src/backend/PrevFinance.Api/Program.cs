@@ -94,6 +94,7 @@ app.MapAuthEndpoints();
 app.MapProfileEndpoints();
 app.MapAccountEndpoints();
 app.MapInstallmentEndpoints();
+app.MapTransactionEndpoints();
 app.MapHealthChecks("/health");
 app.MapHealthChecks("/health/ready");
 

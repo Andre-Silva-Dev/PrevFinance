@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { AccountsApiService } from '../../../core/finance/accounts-api.service';
 import { InstallmentsApiService } from '../../../core/finance/installments-api.service';
+import { TransactionsApiService } from '../../../core/finance/transactions-api.service';
 
 import { FinanceShell } from './finance-shell';
 
@@ -20,10 +21,10 @@ describe('FinanceShell', () => {
     },
     create: () => {
       createCalls += 1;
-      return of({ id: 'a1', name: 'Conta', type: 'Checking', initialBalance: 100, currentBalance: 100 });
+      return of({ id: 'a1', name: 'Conta', type: 'Checking', initialBalance: 100, currentBalance: 100, effectiveBalance: 100 });
     },
-    update: () => of({ id: 'a1', name: 'Conta Nova', type: 'Checking', initialBalance: 100, currentBalance: 100 }),
-    recalibrate: () => of({ id: 'a1', name: 'Conta Nova', type: 'Checking', initialBalance: 100, currentBalance: 90 }),
+    update: () => of({ id: 'a1', name: 'Conta Nova', type: 'Checking', initialBalance: 100, currentBalance: 100, effectiveBalance: 100 }),
+    recalibrate: () => of({ id: 'a1', name: 'Conta Nova', type: 'Checking', initialBalance: 100, currentBalance: 90, effectiveBalance: 90 }),
     listAdjustments: () => of([]),
     delete: () => of(void 0)
   };
@@ -38,7 +39,27 @@ describe('FinanceShell', () => {
       frequency: 'Monthly',
       description: 'Notebook',
       type: 'Expense',
-      installments: []
+      installments: [
+        { id: 't1', number: 1, total: 12, amount: 100, dueOn: '2026-01-31', status: 'Pending' }
+      ]
+    })
+  };
+
+  const transactionsApiMock = {
+    update: () => of({
+      transactions: [
+        {
+          id: 't1',
+          accountId: 'a1',
+          amount: 120,
+          dueOn: '2026-02-10',
+          description: 'Atualizada',
+          status: 'Pending',
+          installmentPlanId: 'p1',
+          installmentNumber: 1,
+          installmentCount: 12
+        }
+      ]
     })
   };
 
@@ -56,6 +77,7 @@ describe('FinanceShell', () => {
         provideRouter([]),
         { provide: AccountsApiService, useValue: accountsApiMock },
         { provide: InstallmentsApiService, useValue: installmentsApiMock },
+        { provide: TransactionsApiService, useValue: transactionsApiMock },
         { provide: AuthSessionService, useValue: sessionMock }
       ]
     })
@@ -106,5 +128,33 @@ describe('FinanceShell', () => {
     component['createInstallmentPlan']();
 
     expect(component['generatedInstallmentPlan']()).not.toBeNull();
+  });
+
+  it('should update installment when edit form is valid', () => {
+    component['generatedInstallmentPlan'].set({
+      id: 'p1',
+      accountId: 'a1',
+      totalAmount: 1200,
+      installmentCount: 12,
+      startDate: '2026-01-31',
+      frequency: 'Monthly',
+      description: 'Notebook',
+      type: 'Expense',
+      installments: [
+        { id: 't1', number: 1, total: 12, amount: 100, dueOn: '2026-01-31', status: 'Pending' }
+      ]
+    });
+
+    component['editInstallmentForm'].setValue({
+      transactionId: 't1',
+      amount: 120,
+      dueOn: '2026-02-10',
+      description: 'Atualizada',
+      applyToFutureInSeries: false
+    });
+
+    component['updateInstallment']();
+
+    expect(component['generatedInstallmentPlan']()?.installments[0].amount).toBe(120);
   });
 });
