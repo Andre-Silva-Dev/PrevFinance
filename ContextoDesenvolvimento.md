@@ -124,6 +124,17 @@ Testes de Integracao: Validacao de fluxo frontend-endpoint via consumo real dos 
 Riscos: Para ambiente local, pode ser necessario configurar proxy de API no Angular para evitar problema de CORS quando backend e frontend estiverem em hosts/portas diferentes.
 Proximo passo: Iniciar Fase 03, TASK-01 mantendo padrao de UI e TDD no frontend.
 
+#### 2026-03-28
+Data: 2026-03-28
+Fase: 02 - Identidade e Multi-Tenancy
+Task: Complemento de Configuracao - Ambiente unificado por .env
+Resumo: Padronizacao de variaveis de ambiente para backend, frontend e docker-compose com criacao de .env local a partir de .env.example, proxy Angular dinamica baseada em FRONTEND_API_BASE_URL, carregamento automatico de .env no startup da API e compose pronto para interpolacao por arquivo de ambiente.
+Evidencias: .env.example; docker-compose.yml; src/backend/PrevFinance.Api/Program.cs; src/frontend/proxy.conf.cjs; src/frontend/angular.json.
+Testes Unitarios: npm run test em src/frontend com 13 testes aprovados apos mudanca de proxy/configuracao.
+Testes de Integracao: dotnet build src/backend/PrevFinance.slnx aprovado; docker compose --env-file .env.example config validado; verificacao de disponibilidade backend/frontend em runtime com status HTTP 200.
+Riscos: Chaves e senhas no .env de desenvolvimento nao devem ser reutilizadas fora do ambiente local; manter segredo real em vault/secret manager nos proximos ambientes.
+Proximo passo: Iniciar Fase 03, TASK-01.
+
 ## Decisoes Arquiteturais Relevantes
 
 | Data | Decisao | Impacto | Justificativa |

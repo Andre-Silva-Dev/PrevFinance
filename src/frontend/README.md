@@ -16,6 +16,11 @@ To start a local development server, run:
 ng serve
 ```
 
+The dev server is configured with a proxy in `proxy.conf.cjs`.
+Requests to `/api/*` are forwarded using `FRONTEND_API_BASE_URL` from the root `.env` file.
+If the variable is missing, it falls back to `http://localhost:5071/api`.
+This avoids the frontend trying to resolve API routes on port `4200`.
+
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
 ## Code scaffolding
