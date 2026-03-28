@@ -7,6 +7,7 @@ using PrevFinance.Application.Abstractions;
 using PrevFinance.Domain.Users;
 using PrevFinance.Infrastructure.Persistence;
 using PrevFinance.Infrastructure.Security;
+using UserProfile = PrevFinance.Domain.Users.Profile;
 
 namespace PrevFinance.Api.Auth;
 
@@ -18,6 +19,7 @@ public static class AuthEndpoints
 
         group.MapPost("/register", RegisterAsync);
         group.MapPost("/login", LoginAsync);
+        group.MapPost("/oauth2/{provider}/callback", OAuth2CallbackAsync);
         group.MapPost("/refresh", RefreshAsync);
         group.MapPost("/logout", LogoutAsync)
             .RequireAuthorization();
@@ -49,7 +51,7 @@ public static class AuthEndpoints
         }
 
         var user = User.CreateWithPassword(Guid.NewGuid(), normalizedEmail, passwordHasher.Hash(request.Password));
-        var profile = Profile.Create(Guid.NewGuid(), user.Id, request.FullName);
+        var profile = UserProfile.Create(Guid.NewGuid(), user.Id, request.FullName);
 
         dbContext.Users.Add(user);
         dbContext.Profiles.Add(profile);
@@ -112,6 +114,59 @@ public static class AuthEndpoints
         }
 
         refreshToken.Revoke(now);
+
+        var tokenPair = await IssueTokenPairAsync(user, dbContext, jwtTokenService, clock, jwtOptions, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return Results.Ok(new AuthResponse(user.Id, user.Email, tokenPair.AccessToken, tokenPair.RefreshToken, tokenPair.RefreshTokenExpiresAtUtc));
+    }
+
+    private static async Task<IResult> OAuth2CallbackAsync(
+        string provider,
+        [FromBody] OAuth2CallbackRequest request,
+        IEnumerable<IOAuth2ProviderClient> providerClients,
+        PrevFinanceDbContext dbContext,
+        IJwtTokenService jwtTokenService,
+        ISystemClock clock,
+        JwtOptions jwtOptions,
+        CancellationToken cancellationToken)
+    {
+        var providerClient = providerClients.FirstOrDefault(x =>
+            string.Equals(x.ProviderName, provider, StringComparison.OrdinalIgnoreCase));
+
+        if (providerClient is null)
+        {
+            return Results.BadRequest(new { error = "OAuth2 provider is not supported." });
+        }
+
+        var identity = await providerClient.ExchangeCodeAsync(request.Code, cancellationToken);
+        if (identity is null)
+        {
+            return Results.Unauthorized();
+        }
+
+        var normalizedProvider = provider.Trim().ToLowerInvariant();
+        var normalizedEmail = identity.Email.Trim().ToLowerInvariant();
+
+        var user = await dbContext.Users.FirstOrDefaultAsync(x =>
+            x.ExternalProvider == normalizedProvider && x.ExternalSubject == identity.Subject,
+            cancellationToken);
+
+        if (user is null)
+        {
+            user = await dbContext.Users.FirstOrDefaultAsync(x => x.Email == normalizedEmail, cancellationToken);
+
+            if (user is null)
+            {
+                user = User.Create(Guid.NewGuid(), normalizedEmail);
+                dbContext.Users.Add(user);
+
+                var profile = UserProfile.Create(Guid.NewGuid(), user.Id, identity.FullName);
+                dbContext.Profiles.Add(profile);
+            }
+
+            user.LinkExternalIdentity(normalizedProvider, identity.Subject);
+        }
 
         var tokenPair = await IssueTokenPairAsync(user, dbContext, jwtTokenService, clock, jwtOptions, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -189,6 +244,8 @@ public static class AuthEndpoints
     public sealed record LoginRequest(string Email, string Password);
 
     public sealed record RefreshRequest(string RefreshToken);
+
+    public sealed record OAuth2CallbackRequest(string Code);
 
     public sealed record AuthResponse(Guid UserId, string Email, string AccessToken, string RefreshToken, DateTime RefreshTokenExpiresAtUtc);
 

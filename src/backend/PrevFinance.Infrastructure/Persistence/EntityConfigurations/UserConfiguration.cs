@@ -19,6 +19,12 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.PasswordHash)
             .HasMaxLength(512);
 
+        builder.Property(x => x.ExternalProvider)
+            .HasMaxLength(64);
+
+        builder.Property(x => x.ExternalSubject)
+            .HasMaxLength(200);
+
         builder.Property(x => x.CreatedAtUtc)
             .HasColumnName("created_at_utc")
             .IsRequired();
@@ -29,5 +35,9 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(x => x.Email)
             .IsUnique();
+
+        builder.HasIndex(x => new { x.ExternalProvider, x.ExternalSubject })
+            .IsUnique()
+            .HasFilter("\"ExternalProvider\" IS NOT NULL AND \"ExternalSubject\" IS NOT NULL");
     }
 }

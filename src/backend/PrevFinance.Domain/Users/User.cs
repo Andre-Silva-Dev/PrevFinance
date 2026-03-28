@@ -8,6 +8,8 @@ public sealed class User : AuditableEntity
     {
         Email = email;
         PasswordHash = passwordHash;
+        ExternalProvider = null;
+        ExternalSubject = null;
     }
 
     private User() : base(Guid.NewGuid())
@@ -19,6 +21,10 @@ public sealed class User : AuditableEntity
     public string Email { get; private set; }
 
     public string? PasswordHash { get; private set; }
+
+    public string? ExternalProvider { get; private set; }
+
+    public string? ExternalSubject { get; private set; }
 
     public static User Create(Guid id, string email)
     {
@@ -46,6 +52,22 @@ public sealed class User : AuditableEntity
         }
 
         PasswordHash = passwordHash;
+    }
+
+    public void LinkExternalIdentity(string provider, string subject)
+    {
+        if (string.IsNullOrWhiteSpace(provider))
+        {
+            throw new ArgumentException("Provider is required.", nameof(provider));
+        }
+
+        if (string.IsNullOrWhiteSpace(subject))
+        {
+            throw new ArgumentException("Subject is required.", nameof(subject));
+        }
+
+        ExternalProvider = provider.Trim().ToLowerInvariant();
+        ExternalSubject = subject.Trim();
     }
 
     private static void ValidateEmail(string email)

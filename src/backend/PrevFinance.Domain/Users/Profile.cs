@@ -33,4 +33,14 @@ public sealed class Profile : AuditableEntity
 
         return new Profile(id, userId, fullName.Trim());
     }
+
+    public void UpdateFullName(string fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            throw new ArgumentException("Full name is required.", nameof(fullName));
+        }
+
+        FullName = fullName.Trim();
+    }
 }
