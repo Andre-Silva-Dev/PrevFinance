@@ -50,6 +50,16 @@ public class DomainEntityValidationTests
     }
 
     [Fact]
+    public void Account_Rename_ShouldTrimName_WhenInputIsValid()
+    {
+        var account = Account.Create(Guid.NewGuid(), Guid.NewGuid(), "Conta", AccountType.Checking, 100m);
+
+        account.Rename("  Conta Nova  ");
+
+        account.Name.Should().Be("Conta Nova");
+    }
+
+    [Fact]
     public void Transaction_Create_ShouldThrow_WhenAmountIsLessOrEqualToZero()
     {
         // Arrange

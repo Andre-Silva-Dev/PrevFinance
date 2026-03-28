@@ -39,4 +39,14 @@ public sealed class Account : AuditableEntity
     {
         return new Account(id, userId, name, type, initialBalance);
     }
+
+    public void Rename(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Account name is required.", nameof(name));
+        }
+
+        Name = name.Trim();
+    }
 }

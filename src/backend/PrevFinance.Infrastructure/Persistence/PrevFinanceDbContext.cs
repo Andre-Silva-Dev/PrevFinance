@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PrevFinance.Application.Abstractions;
 using PrevFinance.Domain.Accounts;
 using PrevFinance.Domain.Common;
 using PrevFinance.Domain.Transactions;
@@ -8,8 +9,12 @@ namespace PrevFinance.Infrastructure.Persistence;
 
 public sealed class PrevFinanceDbContext : DbContext
 {
-    public PrevFinanceDbContext(DbContextOptions<PrevFinanceDbContext> options) : base(options)
+    private readonly ICurrentUserContext? _currentUserContext;
+    private Guid? CurrentUserId => _currentUserContext?.UserId;
+
+    public PrevFinanceDbContext(DbContextOptions<PrevFinanceDbContext> options, ICurrentUserContext? currentUserContext = null) : base(options)
     {
+        _currentUserContext = currentUserContext;
     }
 
     public DbSet<User> Users => Set<User>();
@@ -25,6 +30,19 @@ public sealed class PrevFinanceDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PrevFinanceDbContext).Assembly);
+
+        modelBuilder.Entity<Profile>()
+            .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
+
+        modelBuilder.Entity<Account>()
+            .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
+
+        modelBuilder.Entity<Transaction>()
+            .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
+
         base.OnModelCreating(modelBuilder);
     }
 
