@@ -33,6 +33,6 @@ describe('App', () => {
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Pagina nao encontrada');
+    expect(compiled.textContent).toContain('Essa pagina nao foi encontrada no PrevFinance');
   });
 });
