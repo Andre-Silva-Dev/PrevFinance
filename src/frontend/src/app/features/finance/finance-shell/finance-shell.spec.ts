@@ -19,9 +19,11 @@ describe('FinanceShell', () => {
     },
     create: () => {
       createCalls += 1;
-      return of({ id: 'a1', name: 'Conta', type: 'Checking', initialBalance: 100 });
+      return of({ id: 'a1', name: 'Conta', type: 'Checking', initialBalance: 100, currentBalance: 100 });
     },
-    update: () => of({ id: 'a1', name: 'Conta Nova', type: 'Checking', initialBalance: 100 }),
+    update: () => of({ id: 'a1', name: 'Conta Nova', type: 'Checking', initialBalance: 100, currentBalance: 100 }),
+    recalibrate: () => of({ id: 'a1', name: 'Conta Nova', type: 'Checking', initialBalance: 100, currentBalance: 90 }),
+    listAdjustments: () => of([]),
     delete: () => of(void 0)
   };
 
@@ -64,5 +66,13 @@ describe('FinanceShell', () => {
     component['loadAccounts']();
 
     expect(listCalls).toBeGreaterThan(0);
+  });
+
+  it('should recalibrate account when form is valid', () => {
+    component['recalibrateForm'].setValue({ accountId: 'a1', newBalance: 90, reason: 'Ajuste' });
+
+    component['recalibrateBalance']();
+
+    expect(component['feedback']()).toContain('recalibrado');
   });
 });

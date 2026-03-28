@@ -25,6 +25,8 @@ public sealed class PrevFinanceDbContext : DbContext
 
     public DbSet<Account> Accounts => Set<Account>();
 
+    public DbSet<AccountBalanceAdjustment> AccountBalanceAdjustments => Set<AccountBalanceAdjustment>();
+
     public DbSet<Transaction> Transactions => Set<Transaction>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,6 +37,9 @@ public sealed class PrevFinanceDbContext : DbContext
             .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
 
         modelBuilder.Entity<Account>()
+            .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
+
+        modelBuilder.Entity<AccountBalanceAdjustment>()
             .HasQueryFilter(x => !CurrentUserId.HasValue || x.UserId == CurrentUserId.Value);
 
         modelBuilder.Entity<Transaction>()

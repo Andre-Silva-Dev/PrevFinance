@@ -60,6 +60,25 @@ public class DomainEntityValidationTests
     }
 
     [Fact]
+    public void Account_Create_ShouldUseInitialBalanceAsCurrentBalance_WhenCreated()
+    {
+        var account = Account.Create(Guid.NewGuid(), Guid.NewGuid(), "Conta", AccountType.Checking, 245.7m);
+
+        account.InitialBalance.Should().Be(245.7m);
+        account.CurrentBalance.Should().Be(245.7m);
+    }
+
+    [Fact]
+    public void Account_RecalibrateBalance_ShouldUpdateCurrentBalance_WhenValueChanges()
+    {
+        var account = Account.Create(Guid.NewGuid(), Guid.NewGuid(), "Conta", AccountType.Savings, 100m);
+
+        account.RecalibrateBalance(83.45m);
+
+        account.CurrentBalance.Should().Be(83.45m);
+    }
+
+    [Fact]
     public void Transaction_Create_ShouldThrow_WhenAmountIsLessOrEqualToZero()
     {
         // Arrange

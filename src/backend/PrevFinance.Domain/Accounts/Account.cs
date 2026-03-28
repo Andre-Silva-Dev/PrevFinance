@@ -20,6 +20,7 @@ public sealed class Account : AuditableEntity
         Name = name.Trim();
         Type = type;
         InitialBalance = initialBalance;
+        CurrentBalance = initialBalance;
     }
 
     private Account() : base(Guid.NewGuid())
@@ -35,6 +36,8 @@ public sealed class Account : AuditableEntity
 
     public decimal InitialBalance { get; private set; }
 
+    public decimal CurrentBalance { get; private set; }
+
     public static Account Create(Guid id, Guid userId, string name, AccountType type, decimal initialBalance)
     {
         return new Account(id, userId, name, type, initialBalance);
@@ -48,5 +51,12 @@ public sealed class Account : AuditableEntity
         }
 
         Name = name.Trim();
+    }
+
+    public decimal RecalibrateBalance(decimal newBalance)
+    {
+        var previousBalance = CurrentBalance;
+        CurrentBalance = newBalance;
+        return previousBalance;
     }
 }
