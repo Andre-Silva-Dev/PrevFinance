@@ -32,6 +32,24 @@ public class DomainEntityValidationTests
     }
 
     [Fact]
+    public void User_CreateWithPassword_ShouldStorePasswordHash_WhenDataIsValid()
+    {
+        var user = User.CreateWithPassword(Guid.NewGuid(), "secure@prevfinance.app", "hash-value");
+
+        user.PasswordHash.Should().Be("hash-value");
+    }
+
+    [Fact]
+    public void Profile_UpdateFullName_ShouldTrimName_WhenInputIsValid()
+    {
+        var profile = Profile.Create(Guid.NewGuid(), Guid.NewGuid(), "User Name");
+
+        profile.UpdateFullName("  Updated Name  ");
+
+        profile.FullName.Should().Be("Updated Name");
+    }
+
+    [Fact]
     public void Transaction_Create_ShouldThrow_WhenAmountIsLessOrEqualToZero()
     {
         // Arrange

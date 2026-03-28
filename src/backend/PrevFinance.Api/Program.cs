@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PrevFinance.Api.Auth;
+using PrevFinance.Api.Profile;
 using PrevFinance.Application.Abstractions;
 using PrevFinance.Application.DependencyInjection;
 using PrevFinance.Application.Modules;
@@ -51,6 +52,7 @@ builder.Services
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IOAuth2ProviderClient, DemoOAuth2ProviderClient>();
 
 builder.Services
     .AddPrevFinanceApplication()
@@ -85,6 +87,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapAuthEndpoints();
+app.MapProfileEndpoints();
 app.MapHealthChecks("/health");
 app.MapHealthChecks("/health/ready");
 
