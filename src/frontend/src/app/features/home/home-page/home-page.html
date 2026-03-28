@@ -1,4 +1,48 @@
-<section>
-	<h1>Fundacao PrevFinance</h1>
-	<p>Base frontend organizada por features para Auth, Finance, Projection e Debt.</p>
+<section class="home-page">
+	<article class="hero pf-card" appRevealOnScroll>
+		<div class="hero-content">
+			<span class="pf-pill">MVP em evolucao continua</span>
+			<h1>Organize, projete e execute sua estrategia financeira com clareza.</h1>
+			<p>
+				O PrevFinance combina visao consolidada de contas, projecoes inteligentes e
+				estrategias de quitacao para transformar decisoes financeiras em planos praticos.
+			</p>
+
+			<div class="hero-actions">
+				<a routerLink="/finance" class="pf-button">Abrir centro financeiro</a>
+				<a routerLink="/projection" class="pf-button secondary">Ver projecoes</a>
+			</div>
+		</div>
+
+		<aside class="hero-kpis">
+			<div class="kpi pf-card" appRevealOnScroll [revealDelay]="120">
+				<small>Previsibilidade atual</small>
+				<strong>+87%</strong>
+				<p>Baseada em recorrencias, parcelas e despesas planejadas.</p>
+			</div>
+
+			<div class="kpi pf-card" appRevealOnScroll [revealDelay]="220">
+				<small>Risco de fluxo</small>
+				<strong>Baixo</strong>
+				<p>Sem rompimento de caixa projetado para os proximos 45 dias.</p>
+			</div>
+		</aside>
+	</article>
+
+	<article class="pf-feature-grid">
+		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="80">
+			<h3>Contas e transacoes</h3>
+			<p>Centralize saldos, acompanhe movimentacoes e construa base confiavel para decisoes.</p>
+		</section>
+
+		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="160">
+			<h3>Projecao e alertas</h3>
+			<p>Visualize cenarios futuros e receba sinais antecipados de desequilibrio financeiro.</p>
+		</section>
+
+		<section class="pf-card pf-feature-item" appRevealOnScroll [revealDelay]="240">
+			<h3>Quitacao estrategica</h3>
+			<p>Compare estrategias de pagamento e priorize dividas com melhor impacto no fluxo.</p>
+		</section>
+	</article>
 </section>

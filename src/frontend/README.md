@@ -2,6 +2,12 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
 
+## Frontend visual guide
+
+Use the project identity guide before creating new screens:
+
+- ../../docs/guia-identidade-frontend.md
+
 ## Development server
 
 To start a local development server, run:

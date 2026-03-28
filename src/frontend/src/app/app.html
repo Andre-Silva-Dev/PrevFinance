@@ -1,6 +1,15 @@
 <div class="app-shell">
+  <div class="ambient ambient-left" aria-hidden="true"></div>
+  <div class="ambient ambient-right" aria-hidden="true"></div>
+
   <header class="topbar">
-    <div class="brand">{{ appName }}</div>
+    <div class="brand-wrap">
+      <span class="brand-mark" aria-hidden="true">PF</span>
+      <div>
+        <div class="brand">{{ appName }}</div>
+        <small class="brand-subtitle">Previsao e controle financeiro inteligente</small>
+      </div>
+    </div>
 
     <nav class="menu" aria-label="Navegacao principal">
       @for (item of menu; track item.path) {
@@ -16,7 +25,7 @@
     </nav>
   </header>
 
-  <main class="content">
-    <router-outlet />
+  <main class="content" [class.route-pulse]="routePulse">
+    <router-outlet (activate)="onRouteActivated()"></router-outlet>
   </main>
 </div>
