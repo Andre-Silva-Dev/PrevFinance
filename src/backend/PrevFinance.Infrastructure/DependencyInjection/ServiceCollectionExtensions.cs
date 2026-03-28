@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PrevFinance.Application.Abstractions;
 using PrevFinance.Infrastructure.Persistence;
 using PrevFinance.Infrastructure.Persistence.Seeding;
+using PrevFinance.Infrastructure.Security;
 
 namespace PrevFinance.Infrastructure.DependencyInjection;
 
@@ -22,6 +24,7 @@ public static class ServiceCollectionExtensions
                 npgsql.MigrationsAssembly(typeof(PrevFinanceDbContext).Assembly.FullName)));
 
         services.AddScoped<ISeedDataService, TechnicalSeedDataService>();
+        services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
 
         return services;
     }

@@ -14,6 +14,8 @@ public sealed class PrevFinanceDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     public DbSet<Profile> Profiles => Set<Profile>();
 
     public DbSet<Account> Accounts => Set<Account>();
