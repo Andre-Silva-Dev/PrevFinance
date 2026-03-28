@@ -16,7 +16,7 @@ Use este documento para manter rastreabilidade entre planejamento, execucao e en
 | --- | --- | --- | --- | --- | --- | --- |
 | 01 | Fundacao e Arquitetura | Concluida | 2026-03-27 | 2026-03-27 | Andre Silva | TASK-01, TASK-02 e TASK-03 concluidas com testes |
 | 02 | Identidade e Multi-Tenancy | Concluida | 2026-03-28 | 2026-03-28 | Andre Silva | TASK-01, TASK-02 e TASK-03 concluidas com testes |
-| 03 | Contas, Transacoes e Parcelamento | Nao iniciada | - | - | - | - |
+| 03 | Contas, Transacoes e Parcelamento | Concluida | 2026-03-28 | 2026-03-28 | Andre Silva | TASK-01, TASK-02 e TASK-03 concluidas com backend e frontend |
 | 04 | Projecoes e Dashboard | Nao iniciada | - | - | - | - |
 | 05 | Quitacao de Dividas e Simulacoes | Nao iniciada | - | - | - | - |
 | 06 | Hardening e Release MVP | Nao iniciada | - | - | - | - |
@@ -134,6 +134,39 @@ Testes Unitarios: npm run test em src/frontend com 13 testes aprovados apos muda
 Testes de Integracao: dotnet build src/backend/PrevFinance.slnx aprovado; docker compose --env-file .env.example config validado; verificacao de disponibilidade backend/frontend em runtime com status HTTP 200.
 Riscos: Chaves e senhas no .env de desenvolvimento nao devem ser reutilizadas fora do ambiente local; manter segredo real em vault/secret manager nos proximos ambientes.
 Proximo passo: Iniciar Fase 03, TASK-01.
+
+#### 2026-03-28
+Data: 2026-03-28
+Fase: 03 - Contas, Transacoes e Parcelamento
+Task: TASK-01 - Implementar Gestao de Contas e Saldos
+Resumo: Evolucao da gestao de contas com saldo atual separado do saldo inicial, recalibracao manual por endpoint dedicado e historico de ajustes com trilha de auditoria; frontend atualizado com formulario de recalibracao e visualizacao de historico por conta.
+Evidencias: src/backend/PrevFinance.Api/Finance/AccountEndpoints.cs; src/backend/PrevFinance.Domain/Accounts/AccountBalanceAdjustment.cs; src/backend/PrevFinance.Infrastructure/Persistence/Migrations/20260328124338_AddAccountBalanceAdjustments.cs; src/frontend/src/app/features/finance/finance-shell/finance-shell.ts; commit 8645e03.
+Testes Unitarios: dotnet test src/backend/PrevFinance.slnx com validacoes de dominio de conta e cobertura de sucesso/erro em recalibracao aprovadas; npm test -- --watch=false em src/frontend com cenarios de cadastro/recalibracao aprovados.
+Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com AccountBalanceAdjustmentIntegrationTests cobrindo sucesso, historico e isolamento cross-user aprovados.
+Riscos: Recalibracao frequente sem governanca operacional pode mascarar origem de divergencias de saldo; manter disciplina de motivo de ajuste e auditoria.
+Proximo passo: Executar TASK-02 para motor de parcelamento inteligente.
+
+#### 2026-03-28
+Data: 2026-03-28
+Fase: 03 - Contas, Transacoes e Parcelamento
+Task: TASK-02 - Criar Motor de Parcelamento Inteligente
+Resumo: Implementacao de entidade de plano de parcelamento, enum de frequencia, status de transacao e endpoint de criacao que expande parcelas futuras com soma exata e periodicidade mensal/semanal; frontend recebeu fluxo para gerar parcelamento e visualizar parcelas.
+Evidencias: src/backend/PrevFinance.Api/Finance/InstallmentEndpoints.cs; src/backend/PrevFinance.Domain/Transactions/InstallmentPlan.cs; src/backend/PrevFinance.Infrastructure/Persistence/Migrations/20260328124827_AddInstallmentPlanAndTransactionStatus.cs; src/frontend/src/app/core/finance/installments-api.service.ts; commit 158a11d.
+Testes Unitarios: dotnet test src/backend/PrevFinance.slnx com testes de validacao de InstallmentPlan (sucesso e erro) aprovados; npm test -- --watch=false em src/frontend com fluxo de criacao de parcelamento aprovado.
+Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com InstallmentPlanIntegrationTests cobrindo 12x, soma total, periodicidade e bloqueio de conta de outro usuario aprovados.
+Riscos: Parcelamentos com regras especiais de arredondamento bancario externo podem exigir politica adicional de distribuicao de centavos em fases futuras.
+Proximo passo: Executar TASK-03 para edicao em cascata e overdue.
+
+#### 2026-03-28
+Data: 2026-03-28
+Fase: 03 - Contas, Transacoes e Parcelamento
+Task: TASK-03 - Implementar Edicao Cascata e Regra Overdue
+Resumo: Implementacao de endpoint de patch de transacao com opcao de edicao individual ou em cascata para parcelas futuras, deteccao de conflito quando serie futura possui itens finalizados, regra automatica de overdue para pendencias vencidas e saldo efetivo de conta considerando pendencias ativas; frontend recebeu formulario de edicao de parcela com cascata e exibicao de saldo efetivo.
+Evidencias: src/backend/PrevFinance.Api/Finance/TransactionEndpoints.cs; src/backend/PrevFinance.Api/Finance/AccountEndpoints.cs; src/backend/PrevFinance.IntegrationTests/Finance/TransactionCascadeAndOverdueIntegrationTests.cs; src/frontend/src/app/core/finance/transactions-api.service.ts; commit 69aa988.
+Testes Unitarios: dotnet test src/backend/PrevFinance.slnx com cenarios de sucesso/erro para update de transacao e marcacao overdue aprovados; npm test -- --watch=false em src/frontend com fluxo de edicao de parcela aprovado.
+Testes de Integracao: dotnet test src/backend/PrevFinance.slnx com cenarios de edicao em cascata, conflito por parcela finalizada e impacto de overdue no saldo efetivo aprovados.
+Riscos: Edicao em cascata de series extensas pode demandar paginacao/otimizacao de consulta em cenarios de alto volume.
+Proximo passo: Iniciar Fase 04, TASK-01 (motor de projecao).
 
 ## Decisoes Arquiteturais Relevantes
 
